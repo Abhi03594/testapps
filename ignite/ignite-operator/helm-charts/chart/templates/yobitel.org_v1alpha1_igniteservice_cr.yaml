@@ -10,7 +10,7 @@ spec:
 
   image:
     repository: apacheignite/ignite
-    tag: 2.8.0
+    tag: 2.8.1
     pullPolicy: IfNotPresent
  
   nameOverride: ""
