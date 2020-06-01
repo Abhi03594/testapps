@@ -1,0 +1,11 @@
+apiVersion: v1
+appVersion: 7.9.2
+dependencies:
+- condition: postgresql.enabled
+  name: postgresql
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 8.2.0
+description: SonarQube is an open source platform for continuous inspection of code
+  quality.
+name: sonarqube
+version: "1"

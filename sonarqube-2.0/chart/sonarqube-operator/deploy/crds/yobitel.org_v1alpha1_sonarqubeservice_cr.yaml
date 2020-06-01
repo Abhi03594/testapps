@@ -1,0 +1,95 @@
+apiVersion: yobitel.org/v1alpha1
+kind: SonarqubeService
+metadata:
+  name: example-sonarqubeservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/sonarqube/values.yaml
+  
+  affinity: {}
+  annotations: {}
+  customCerts:
+    enabled: false
+    secretName: my-cacerts
+  database:
+    type: postgresql
+  deploymentStrategy: {}
+  elasticsearch:
+    bootstrapChecks: true
+    configureNode: true
+  extraEnv: {}
+  hostAliases: []
+  hpa:
+    enabled: true
+  image:
+    repository: sonarqube
+    tag: 7.9.2-community
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - name: sonar.organization.com
+      path: /
+    tls: []
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    sonarWebContext: /
+  mysql:
+    enabled: false
+    mysqlDatabase: sonarDB
+    mysqlPassword: sonarPass
+    mysqlUser: sonarUser
+    service:
+      port: 3306
+  namespace: sonarqube
+  nodeSelector: {}
+  persistence:
+    accessMode: ReadWriteOnce
+    annotations: {}
+    enabled: true
+    mounts: []
+    size: 10Gi
+    storageClass: gp2
+    volumes: []
+  plugins:
+    install: []
+    resources: {}
+  podDisruptionBudget:
+    minAvailable: 1
+  podLabels: {}
+  postgresql:
+    enabled: true
+    postgresDatabase: sonarDB
+    postgresPassword: sonarPass
+    postgresUser: sonarUser
+    service:
+      port: 5432
+  readinessProbe:
+    failureThreshold: 6
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    sonarWebContext: /
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+  securityContext:
+    fsGroup: 999
+  service:
+    annotations: {}
+    externalPort: 9000
+    internalPort: 9000
+    labels: null
+    type: LoadBalancer
+  sidecars:
+    enabled: true
+    image: yobitel/k8s-sidecar:0.1.20
+    imagePullPolicy: IfNotPresent
+    resources: {}
+  sonarqubeFolder: /opt/sonarqube
+  tolerations: []
+  
