@@ -1,0 +1,80 @@
+namespace: ignite
+replicaCount: 2
+
+image:
+  repository: apacheignite/ignite
+  tag: 2.8.0
+  pullPolicy: IfNotPresent
+
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: ignite-opeartor
+
+serviceAccount:
+  create: true
+  name: ignite-operator
+
+nameOverride: ""
+fullnameOverride: ""
+
+securityContext:
+  enabled: true
+  runAsUser: 1000
+
+serviceAccount:
+  create: true
+  name:
+
+sidecars:
+  enabled: true
+  image: yobitel/k8s-sidecar:0.1.20
+  imagePullPolicy: IfNotPresent
+  resources: {}
+
+hpa:
+  enabled: true
+
+
+dataStorage:
+  config: |-
+
+env:
+  OPTION_LIBS: "ignite-kubernetes,ignite-rest-http"
+  IGNITE_QUIET: "false"
+  JVM_OPTS: "-Djava.net.preferIPv4Stack=true"
+peerClassLoadingEnabled: false
+
+podDisruptionBudget:
+  minAvailable: 1
+
+persistence:
+  enabled: true
+  persistenceVolume:
+    size: 8Gi
+    provisioner: kubernetes.io/aws-ebs
+    provisionerParameters:
+      type: gp2
+      fsType: ext4
+  walVolume:
+    size: 8Gi
+    provisioner: kubernetes.io/aws-ebs
+    provisionerParameters:
+      type: gp2
+      fsType: ext4
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

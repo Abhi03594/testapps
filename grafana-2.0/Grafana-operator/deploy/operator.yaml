@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Grafana-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: Grafana-operator
+  template:
+    metadata:
+      labels:
+        name: Grafana-operator
+    spec:
+      serviceAccountName: Grafana-operator
+      containers:
+        - name: Grafana-operator
+          # Replace this with the built image name
+          image: REPLACE_IMAGE
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "Grafana-operator"
