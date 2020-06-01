@@ -23,11 +23,11 @@ crd:
 
 rbac:
   create: true
-  name: couchdb-opeartor
+  name: ignite-opeartor
 
 serviceAccount:
   create: true
-  name: couchdb-operator
+  name: ignite-operator
 
 sidecars:
   enabled: true
