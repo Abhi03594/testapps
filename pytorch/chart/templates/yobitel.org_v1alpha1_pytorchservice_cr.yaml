@@ -1,0 +1,102 @@
+apiVersion: yobitel.org/v1alpha1
+kind: PytorchService
+metadata:
+  name: example-pytorchservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/pytorch/values.yaml
+namespace: pytorch
+image:
+  registry: docker.io
+  repository: pytorch/pytorch
+  tag: 1.4-cuda10.1-cudnn7-devel
+  pullPolicy: IfNotPresent
+  debug: false
+
+hpa:
+  enabled: true
+
+podDisruptionBudget:
+  minAvailable: 1
+
+
+sidecars:
+  enabled: true
+  image: yobitel/k8s-sidecar:0.1.20
+  imagePullPolicy: IfNotPresent
+  resources: {}
+volumePermissions:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: yobitel/minideb
+    tag: stretch
+    pullPolicy: Always
+  resources:
+    limits: {}
+    #   cpu: 100m
+    #   memory: 128Mi
+    requests: {}
+    #   cpu: 100m
+    #   memory: 128Mi
+
+service:
+  type: LoadBalancer
+  port: 49875
+  annotations: {}
+
+entrypoint:
+  file:
+  
+mode: standalone
+port: 49875
+
+
+cloneFilesFromGit:
+  enabled: false
+  
+nodeSelector: {}
+
+
+tolerations: []
+
+
+affinity: {}
+
+
+securityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 1001
+
+resources:
+  limits: 
+    cpu: 250m
+    memory: 256Mi
+  requests: 
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 1
+  successThreshold: 1
+  failureThreshold: 5
+
+persistence:
+  
+  enabled: true
+  mountPath: /pytorch/pytorch
+  accessModes:
+    - ReadWriteOnce
+  size: 8Gi
+  storageClass: gp2
+  annotations: {}
