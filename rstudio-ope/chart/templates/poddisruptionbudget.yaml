@@ -1,0 +1,13 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "rstudio.fullname" . }}-pdb
+  namespace: {{ .Values.namespace }}
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    matchLabels:
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}
