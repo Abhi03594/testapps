@@ -1,0 +1,60 @@
+apiVersion: yobitel.org/v1alpha1
+kind: RstudioService
+metadata:
+  name: example-rstudioservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/rstudio/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  hpa:
+    enabled: true
+  image:
+    pullPolicy: IfNotPresent
+    repository: yobitel/rstudio
+    tag: 4.0.0
+  imagePullSecrets: []
+  ingress:
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /$2
+    enabled: false
+    hosts:
+    - host: null
+      paths:
+      - /rstudio(/|$)(.*)
+    tls: []
+  nameOverride: ""
+  namespace: rstudio
+  nodeSelector: {}
+  persistence:
+    accessMode: ReadWriteOnce
+    enabled: true
+    size: 8Gi
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podSecurityContext:
+    fsGroup: 2000
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  securityContext: null
+  service:
+    port: 80
+    type: LoadBalancer
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: null
+  sidecars:
+    enabled: true
+    image: yobitel/k8s-sidecar:0.1.20
+    imagePullPolicy: IfNotPresent
+    resources: {}
+  tolerations: []
+  
