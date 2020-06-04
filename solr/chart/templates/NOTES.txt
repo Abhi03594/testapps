@@ -1,0 +1,19 @@
+
+a. Get the solr server URL by running these commands in the same shell:
+
+  $ export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "solr.service-name" . }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+ 
+  $ echo http://$SERVICE_IP:{{ .Values.port }}
+
+
+b. If you are unable to fetch the service IP from above command then run the following command:
+
+    $ kubectl get svc -n solr
+
+   Fetch the Service IP from above command and host the application in the browser:
+    
+   http://$SERVICE_IP:{{ .Values.port }}
+
+   Note: replace the ​$ServiceIP with the ExternalIP you fetch from​ $ kubectl get svc -n solr ​command 
+
+

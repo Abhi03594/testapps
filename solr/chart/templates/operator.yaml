@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solr-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: solr-operator
+  template:
+    metadata:
+      labels:
+        name: solr-operator
+    spec:
+      serviceAccountName: solr-operator
+      containers:
+        - name: solr-operator
+          # Replace this with the built image name
+          image: REPLACE_IMAGE
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "solr-operator"
