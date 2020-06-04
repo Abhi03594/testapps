@@ -11,9 +11,18 @@ service:
   type: LoadBalancer
   annotations: {}
 
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: solr-opeartor
+
+serviceAccount:
+  create: true
+  name: solr-operator
+
 port: 8983
-
-
 
 livenessProbe:
   initialDelaySeconds: 45

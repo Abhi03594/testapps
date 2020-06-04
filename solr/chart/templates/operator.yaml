@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: solr-operator
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 1
   selector:
@@ -16,7 +17,7 @@ spec:
       containers:
         - name: solr-operator
           # Replace this with the built image name
-          image: REPLACE_IMAGE
+          image: yobitel/solr-ope:8.5.1
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
