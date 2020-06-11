@@ -1,0 +1,84 @@
+apiVersion: yobitel.org/v1alpha1
+kind: SolrService
+metadata:
+  name: example-solrservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/solr/values.yaml
+  
+  affinity: {}
+  exporter:
+    configFile: /opt/solr/contrib/prometheus-exporter/conf/solr-exporter-config.xml
+    enabled: false
+    image: {}
+    livenessProbe:
+      initialDelaySeconds: 20
+      periodSeconds: 10
+    podAnnotations: {}
+    port: 9983
+    readinessProbe:
+      initialDelaySeconds: 15
+      periodSeconds: 5
+    resources: {}
+    service:
+      annotations: {}
+      type: ClusterIP
+    threads: 7
+    updateStrategy: {}
+  extraEnvVars: []
+  hpa:
+    enabled: true
+  image:
+    pullPolicy: IfNotPresent
+    repository: solr
+    tag: 8.5.1
+  javaMem: -Xms2g -Xmx3g
+  livenessProbe:
+    initialDelaySeconds: 45
+    periodSeconds: 10
+  logLevel: INFO
+  namespace: solr
+  podAnnotations: {}
+  podDisruptionBudget:
+    maxUnavailable: 1
+  port: 8983
+  readinessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 5
+  replicaCount: 3
+  resources:
+    limits:
+      cpu: 56
+      memory: 256Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  service:
+    annotations: {}
+    type: LoadBalancer
+  sidecar:
+    image: yobitel/k8s-sidecar:0.1.20
+    imagePullPolicy: IfNotPresent
+    resources: {}
+  terminationGracePeriodSeconds: 180
+  tls:
+    caSecret:
+      bundlePath: ""
+      name: ""
+    certSecret:
+      certPath: tls.crt
+      keyPath: tls.key
+      name: ""
+    checkPeerName: "false"
+    enabled: false
+    importKubernetesCA: "false"
+    keystorePassword: changeit
+    needClientAuth: "false"
+    wantClientAuth: "false"
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    accessModes:
+    - ReadWriteOnce
+    storageClassName: ""
+    storageSize: 20Gi
+  
