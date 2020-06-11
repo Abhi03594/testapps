@@ -1,0 +1,96 @@
+apiVersion: yobitel.org/v1alpha1
+kind: NifiService
+metadata:
+  name: example-nifiservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/nifi/values.yaml
+  
+  auth:
+    ldap:
+      enabled: false
+      host: ldap://<hostname>:<port>
+      searchBase: CN=Users,DC=example,DC=com
+      searchFilter: CN=john
+  headless:
+    annotations:
+      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+    type: ClusterIP
+  hpa:
+    enabled: true
+  image:
+    pullPolicy: IfNotPresent
+    repository: apache/nifi
+    tag: 1.11.4
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts: []
+    path: /
+    tls: []
+  jvmMemory: 2g
+  logresources:
+    limits:
+      cpu: 50m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 10Mi
+  nodeSelector: {}
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    contentRepoStorage:
+      size: 10Gi
+    dataStorage:
+      size: 5Gi
+    enabled: true
+    flowfileRepoStorage:
+      size: 10Gi
+    logStorage:
+      size: 5Gi
+    provenanceRepoStorage:
+      size: 10Gi
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  properties:
+    authorizer: managed-authorizer
+    clusterPort: 6007
+    clusterSecure: false
+    externalSecure: false
+    httpPort: 8080
+    httpsPort: null
+    isNode: true
+    needClientAuth: false
+    provenanceStorage: 8 GB
+    siteToSite:
+      port: 10000
+      secure: false
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+  service:
+    annotations: {}
+    httpPort: 80
+    httpsPort: 443
+    type: LoadBalancer
+  sidecar:
+    image: yobitel/k8s-sidecar:0.1.20
+  sts:
+    AntiAffinity: soft
+    hostPort: null
+    podManagementPolicy: Parallel
+  tolerations: []
+  zookeeper:
+    enabled: true
+    port: 2181
+    url: ""
+  
