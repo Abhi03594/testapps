@@ -1,0 +1,16 @@
+apiVersion: v1
+appVersion: 1.11.4
+dependencies:
+- name: zookeeper
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  version: 3.5.5
+description: Apache NiFi is a software project from the Apache Software Foundation
+  designed to automate the flow of data between software systems.
+home: https://nifi.apache.org/
+icon: https://svn.apache.org/repos/asf/nifi/site/trunk/images/niFi-logo-horizontal-scaled.png
+keywords:
+- nifi
+- data
+- process
+name: nifi
+version: 1.0
