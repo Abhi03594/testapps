@@ -1,7 +1,16 @@
 Cluster endpoint IP address will be available at:
-kubectl get svc {{ .Release.Name }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[*].ip}'
+a. $ kubectl get svc {{ .Release.Name }} -n {{ .Values.namespace }} -o jsonpath='{.status.loadBalancer.ingress[*].ip}'
 
-Cluster endpoint domain name is: {{.Values.properties.webProxyHost}} - please update your DNS or /etc/hosts accordingly! 
+b. If you are unable to fetch the service IP from above command then run the following command:
+
+    $ kubectl get svc -n {{ .Values.namespace }}
+
+   Fetch the Service IP from above command and host the application in the browser:
+    
+   http://$ServiceIP:9000
+
+   Note: replace the ​$ServiceIP with the ExternalIP you fetch from​ $ kubectl get svc -n {{ .Values.namespace }} ​command 
+
 
 Once you are done, your NiFi instance will be available at:
 
