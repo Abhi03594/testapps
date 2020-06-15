@@ -1,0 +1,25 @@
+apiVersion: v1
+entries:
+  kong:
+  - apiVersion: v1
+    appVersion: "1.4"
+    created: "2020-06-15T17:55:03.315717505+05:30"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 8.2.0
+    description: DEPRECATED The Cloud-Native Ingress and API-management
+    digest: 1fca6215ab7451dd1784514332f48f66f78477882905a98d7de35ff6c8067901
+    home: https://konghq.com/
+    icon: https://s3.amazonaws.com/downloads.kong/universe/assets/icon-kong-inc-large.png
+    maintainers:
+    - email: shashi@konghq.com
+      name: shashiranjan84
+    - email: harry@konghq.com
+      name: hbagdi
+    name: kong
+    urls:
+    - kong-0.36.6.tgz
+    version: 0.36.6
+generated: "2020-06-15T17:55:03.312974471+05:30"

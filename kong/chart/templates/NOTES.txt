@@ -1,0 +1,24 @@
+To connect to Kong, please execute the following command
+
+
+a.{{- if contains "LoadBalancer" .Values.proxy.type }}
+  HOST=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "kong.fullname" . }}-proxy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  PORT=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "kong.fullname" . }}-proxy -o jsonpath='{.spec.ports[0].port}')
+{{- else if contains "NodePort" .Values.proxy.type -}}
+  HOST=$(kubectl get nodes --namespace {{ .Values.namespace }} -o jsonpath='{.items[0].status.addresses[0].address}')
+  PORT=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "kong.fullname" . }}-proxy -o jsonpath='{.spec.ports[0].nodePort}')
+{{- end -}}
+export PROXY_IP=${HOST}:${PORT}
+curl $PROXY_IP
+
+b. If you are unable to fetch the PROXY_IP from above command then run the following command:
+
+    $ kubectl get svc --namespace {{ .Values.namespace }}
+    
+   http://$PROXY_IP:80
+
+   Note: replace the ​$PROXY_IP with the ExternalIP you fetch from​ $ kubectl get svc --namespace {{ .Values.namespace }} ​command 
+
+Once installed, please follow along the getting started guide to start using Kong:
+https://bit.ly/k4k8s-get-started
+
