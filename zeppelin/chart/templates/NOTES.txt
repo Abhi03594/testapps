@@ -1,0 +1,5 @@
+1. Get Service IP  
+
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ .Release.Name }}-zeppelin --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+   echo http://$SERVICE_IP:8080

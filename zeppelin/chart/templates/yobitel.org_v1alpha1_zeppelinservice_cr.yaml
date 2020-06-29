@@ -1,0 +1,63 @@
+apiVersion: yobitel.org/v1alpha1
+kind: ZeppelinService
+metadata:
+  name: example-zeppelinservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/zeppelin/values.yaml
+  
+  hadoop:
+    configMapName: hadoop-hadoop
+    configPath: /usr/hadoop-2.7.3/etc/hadoop
+    useConfigMap: false
+  hpa:
+    enabled: true
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - zeppelin.local
+    path: /
+    tls: []
+  namespace: zeppelin
+  nodeSelector: {}
+  persistence:
+    accessMode: ReadWriteOnce
+    annotations: null
+    enabled: true
+    size: 30Gi
+    storageClass: gp2
+  podDisruptionBudget:
+    maxUnavailable: 1
+  spark:
+    driverMemory: 1g
+    executorMemory: 1g
+    numExecutors: 2
+  zeppelin:
+    deploymentStrategy:
+      maxUnavailable: 0
+      type: RollingUpdate
+    image:
+      pullPolicy: IfNotPresent
+      repository: apache/zeppelin
+      tag: 0.8.1
+    livenessProbe:
+      initialDelaySeconds: 45
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      initialDelaySeconds: 20
+      timeoutSeconds: 1
+    replicaCount: 3
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1024Mi
+      requests:
+        cpu: 1000m
+        memory: 1024Mi
+    service:
+      port: 8080
+      type: LoadBalancer
+  

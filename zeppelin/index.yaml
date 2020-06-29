@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  zeppelin:
+  - apiVersion: v1
+    appVersion: 0.7.3
+    created: "2020-06-29T17:30:54.514615187+05:30"
+    description: Web-based notebook that enables data-driven, interactive data analytics
+      and collaborative documents with SQL, Scala and more.
+    digest: 442884558c17759d6fc00315f57e5b609a787b99253e33f09122df24bd354ea8
+    name: zeppelin
+    urls:
+    - zeppelin-1.1.0.tgz
+    version: 1.1.0
+generated: "2020-06-29T17:30:54.513747962+05:30"
