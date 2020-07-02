@@ -1,0 +1,84 @@
+{{- if .Values.postgres.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-postgres
+  labels:
+    service: druid-postgres
+spec:
+  ports:
+  - port: {{.Values.postgres.port}}
+    name: druid-postgres
+  selector:
+    app: {{ include "druid.name" . }}-postgres
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-postgres
+  name: druid-postgres
+spec:
+  serviceName: druid-postgres-service
+  replicas: {{.Values.postgres.replicas}}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-postgres
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-postgres
+    spec:
+      containers:
+      - image: postgres:11.4
+        name: druid-postgres
+        env:
+        # - name: "POSTGRES_PASSWORD"
+        #   value: "{{.Values.postgres.password}}"
+        - name: "POSTGRES_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        - name: "POSTGRES_USER"
+          value: "{{.Values.postgres.user}}"
+        - name: "PGDATA"
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - name: "postgres"
+          containerPort: {{.Values.postgres.port}}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: druid-postgres-pvc
+        resources:
+          {{- with .Values.broker.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+      restartPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: "druid-postgres-pvc"
+    spec:
+      accessModes:
+        - {{.Values.postgres.volume.accessMode}}
+      resources:
+        requests:
+          storage: {{.Values.postgres.volume.size}}
+status:
+  replicas: {{.Values.postgres.replicas}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: druid-postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+        storage: {{.Values.postgres.volume.size}}
+    limits:
+        storage: {{.Values.postgres.volume.size}}
+{{- end }}

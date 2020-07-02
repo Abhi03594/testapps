@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-historical-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: "historical"
+    port: {{ .Values.historical.port }}
+    targetPort: {{ .Values.historical.port }}
+  selector:
+    app: {{ include "druid.name" . }}-historical
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-historical
+    chart: {{ include "druid.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "druid.name" . }}-historical
+spec:
+  replicas: {{ .Values.historical.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-historical
+  serviceName: "druid-historical-service"
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-historical
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: druid_host
+          value: $(POD_NAME).druid-historical-service.$(POD_NAMESPACE).svc.cluster.local
+        - name: DRUID_XMS
+          value: {{ .Values.historical.xms }}
+        - name: DRUID_XMX
+          value: {{ .Values.historical.xmx }}
+        {{- if .Values.historical.maxDirectMemorySize }}
+        - name: DRUID_MAXDIRECTMEMORYSIZE
+          value: {{ .Values.historical.maxDirectMemorySize }}
+        {{- end }}
+        {{- if .Values.historical.maxNewSize }}
+        - name: DRUID_MAXNEWSIZE
+          value: {{ .Values.historical.maxNewSize }}
+        {{- end }}
+        {{- if .Values.historical.maxSize }}
+        - name: DRUID_MAXSIZE
+          value: {{ .Values.historical.maxSize }}
+        {{- end }}
+        {{- if .Values.awsRegion }}
+        - name: AWS_REGION
+          value: {{ .Values.awsRegion }}
+        {{- end }}
+        {{- if eq .Values.indexer.type "s3" }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_access_key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_secret_access_key
+        {{- end }}
+        {{- if eq .Values.metadataStorage.type "postgresql" }}
+        - name: METADATA_STORAGE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["{{.Values.entryPoint}}"]
+        args: ["{{.Values.historical.args}}"]
+        name: {{ include "druid.name" . }}-historical
+        ports:
+        - name: "historical"
+          containerPort: {{ .Values.historical.port }}
+        resources:
+          {{- with .Values.historical.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+          - name: historical-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/_common/common.runtime.properties
+            subPath: common.runtime.properties
+          - name: historical-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/data/historical/runtime.properties
+            subPath: runtime.properties
+          {{- if .Values.localPersistence }}
+          - name: druidsegments
+            mountPath: /opt/apache-druid-0.17.0/var/druid_segments
+            subPath: druid_segments
+          {{- end }}
+      volumes:
+        - name: historical-conf
+          configMap:
+            name: druid
+            items:
+            - key: common
+              path: common.runtime.properties
+            - key: historical
+              path: runtime.properties
+        {{- if .Values.localPersistence }}
+        - name: druidsegments
+          persistentVolumeClaim:
+            claimName: 'druidstore'
+        {{- end }}
+      restartPolicy: {{ .Values.historical.restartPolicy }}
+status:
+  replicas: {{ .Values.historical.replicas }}

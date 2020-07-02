@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-coordinator-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: "coordinator"
+    port: {{ .Values.coordinator.port }}
+    targetPort: {{ .Values.coordinator.port }}
+  {{- if .Values.localPersistence }}
+  - name: "derby"
+    port: 1527
+    targetPort: 1527
+  {{- end }}
+  selector:
+    app: {{ include "druid.name" . }}-coordinator
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-coordinator
+    chart: {{ include "druid.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "druid.name" . }}-coordinator
+spec:
+  replicas: {{ .Values.coordinator.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-coordinator
+  serviceName: "druid-coordinator-service"
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-coordinator
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: druid_host
+          value: $(POD_NAME).druid-coordinator-service.$(POD_NAMESPACE).svc.cluster.local
+        - name: DRUID_XMS
+          value: {{ .Values.coordinator.xms }}
+        - name: DRUID_XMX
+          value: {{ .Values.coordinator.xmx }}
+        {{- if .Values.coordinator.maxDirectMemorySize }}
+        - name: DRUID_MAXDIRECTMEMORYSIZE
+          value: {{ .Values.coordinator.maxDirectMemorySize }}
+        {{- end }}
+        {{- if .Values.coordinator.maxNewSize }}
+        - name: DRUID_MAXNEWSIZE
+          value: {{ .Values.coordinator.maxNewSize }}
+        {{- end }}
+        {{- if .Values.coordinator.maxSize }}
+        - name: DRUID_MAXSIZE
+          value: {{ .Values.coordinator.maxSize }}
+        {{- end }}
+        - name: AWS_REGION
+          value: {{ .Values.awsRegion }}
+        {{- if eq .Values.indexer.type "s3" }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_access_key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_secret_access_key
+        {{- end }}
+        {{- if eq .Values.metadataStorage.type "postgresql" }}
+        - name: METADATA_STORAGE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["{{.Values.entryPoint}}"]
+        args: ["{{.Values.coordinator.args}}"]
+        name: {{ include "druid.name" . }}-coordinator
+        ports:
+        - name: "coordinator"
+          containerPort: {{ .Values.coordinator.port }}
+        {{- if .Values.localPersistence }}
+        - name: "derby"
+          containerPort: 1527
+        {{- end}}
+        resources:
+          {{- with .Values.coordinator.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+          {{- if .Values.localPersistence }}
+          - name: druid-clustered-master-derby
+            mountPath: /apache-druid-0.17-incubating/var/druid/
+          {{- end }}
+          - name: coordinator-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/_common/common.runtime.properties
+            subPath: common.runtime.properties
+          - name: coordinator-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/master/coordinator-overlord/runtime.properties
+            subPath: runtime.properties
+          {{- if .Values.localPersistence }}
+          - name: druidsegments
+            mountPath: /opt/apache-druid-0.17.0/var/druid_segments
+            subPath: druid_segments
+          {{- end }}
+      volumes:
+        - name: coordinator-conf
+          configMap:
+            name: druid
+            items:
+            - key: common
+              path: common.runtime.properties
+            - key: coordinator
+              path: runtime.properties
+        {{- if .Values.localPersistence }}
+        - name: druidsegments
+          persistentVolumeClaim:
+            claimName: 'druidstore'
+        {{- end }}
+      restartPolicy: {{ .Values.coordinator.restartPolicy }}
+  volumeClaimTemplates:
+  - metadata:
+      name: druid-clustered-master-derby
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+        limits:
+          storage: 1Gi
+status:
+  replicas: {{ .Values.coordinator.replicas }}

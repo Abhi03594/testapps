@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Apache druid
+name: druid
+version: 0.0.1

@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-broker-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: "broker"
+    port: {{ .Values.broker.port }}
+    targetPort: {{ .Values.broker.port }}
+  selector:
+    app: {{ include "druid.name" . }}-broker
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-broker
+    chart: {{ include "druid.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "druid.name" . }}-broker
+spec:
+  replicas: {{ .Values.broker.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-broker
+  serviceName: "druid-broker-service"
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-broker
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: druid_host
+          value: $(POD_NAME).druid-broker-service.$(POD_NAMESPACE).svc.cluster.local
+        - name: DRUID_XMS
+          value: {{ .Values.broker.xms }}
+        - name: DRUID_XMX
+          value: {{ .Values.broker.xmx }}
+        {{- if .Values.broker.maxDirectMemorySize }}
+        - name: DRUID_MAXDIRECTMEMORYSIZE
+          value: {{ .Values.broker.maxDirectMemorySize }}
+        {{- end }}
+        {{- if .Values.broker.maxNewSize }}
+        - name: DRUID_MAXNEWSIZE
+          value: {{ .Values.broker.maxNewSize }}
+        {{- end }}
+        {{- if .Values.broker.maxSize }}
+        - name: DRUID_MAXSIZE
+          value: {{ .Values.broker.maxSize }}
+        {{- end }}
+        {{- if .Values.awsRegion }}
+        - name: AWS_REGION
+          value: {{ .Values.awsRegion }}
+        {{- end }}
+        {{- if eq .Values.indexer.type "s3" }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_access_key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_secret_access_key
+        {{- end }}
+        {{- if eq .Values.metadataStorage.type "postgresql" }}
+        - name: METADATA_STORAGE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["{{.Values.entryPoint}}"]
+        args: ["{{.Values.broker.args}}"]
+        name: {{ include "druid.name" . }}-broker
+        ports:
+        - name: "broker"
+          containerPort: {{ .Values.broker.port }}
+        resources:
+          {{- with .Values.broker.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+          - name: broker-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/_common/common.runtime.properties
+            subPath: common.runtime.properties
+          - name: broker-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/query/broker/runtime.properties
+            subPath: runtime.properties
+          {{- if .Values.localPersistence }}
+          - name: druidsegments
+            mountPath: /opt/apache-druid-0.17.0/var/druid_segments
+            subPath: druid_segments
+          {{- end }}
+      volumes:
+        - name: broker-conf
+          configMap:
+            name: druid
+            items:
+            - key: common
+              path: common.runtime.properties
+            - key: broker
+              path: runtime.properties
+        {{- if .Values.localPersistence }}
+        - name: druidsegments
+          persistentVolumeClaim:
+            claimName: 'druidstore'
+        {{- end }}
+      restartPolicy: {{ .Values.broker.restartPolicy }}
+status:
+  replicas: {{ .Values.broker.replicas }}

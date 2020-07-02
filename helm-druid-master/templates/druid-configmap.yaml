@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: druid
+data:
+  common: |
+    druid.extensions.loadList={{.Values.extensions}}
+    # overridden by druid_host env var
+    druid.host=localhost
+
+    #
+    # Logging
+    #
+
+    # Log all runtime properties on startup. Disable to avoid logging properties on startup:
+    druid.startup.logging.logProperties=true
+
+    #
+    # Zookeeper
+    #
+
+    druid.zk.service.host={{.Values.zookeeper.host}}
+    druid.zk.paths.base={{.Values.zookeeper.pathsBase}}
+
+    #
+    # Metadata storage
+    #
+
+    druid.metadata.storage.type={{.Values.metadataStorage.type}}
+    druid.metadata.storage.connector.connectURI={{.Values.metadataStorage.connectURI}}
+    {{- if eq .Values.metadataStorage.type "derby" }}
+    # TODO: pass in through values file
+    druid.metadata.storage.connector.host={{.Values.metadataStorage.host}}
+    druid.metadata.storage.connector.port=1527
+    {{- end }}
+    {{- if ne .Values.metadataStorage.type "derby" }}
+    druid.metadata.storage.connector.user={{.Values.metadataStorage.user}}
+    druid.metadata.storage.connector.password={ "type": "environment", "variable": "METADATA_STORAGE_PASSWORD" }
+    {{- end }}
+
+    #
+    # Deep storage
+    #
+
+    druid.storage.type={{.Values.segmentStorage.type}}
+    {{- if ne .Values.segmentStorage.type "s3" }}
+    druid.storage.storageDirectory=var/druid_segments/segments
+    {{- end }}
+    {{- if eq .Values.segmentStorage.type "s3" }}
+    druid.storage.bucket={{.Values.segmentStorage.bucket}}
+    druid.storage.baseKey={{.Values.segmentStorage.baseKey}}
+    {{- end }}
+
+    #
+    # Indexing service logs
+    #
+
+    # For local disk (only viable in a cluster if this is a network mount):
+    druid.indexer.logs.type={{.Values.indexer.type}}
+    {{- if ne .Values.segmentStorage.type "s3" }}
+    druid.indexer.logs.directory={{.Values.indexer.directory}}
+    {{- end }}
+    {{- if eq .Values.segmentStorage.type "s3" }}
+    druid.indexer.logs.s3Bucket={{.Values.indexer.s3Bucket}}
+    druid.indexer.logs.s3Prefix={{.Values.indexer.s3Prefix}}
+    {{- end }}
+
+    #
+    # Service discovery
+    #
+
+    druid.selectors.indexing.serviceName=druid/overlord
+    druid.selectors.coordinator.serviceName=druid/coordinator
+
+    #
+    # Monitoring
+    #
+
+    druid.monitoring.monitors=["org.apache.druid.java.util.metrics.JvmMonitor"]
+    druid.emitter=noop
+    druid.emitter.logging.logLevel=info
+
+    # Storage type of double columns
+    # ommiting this will lead to index double as float at the storage layer
+
+    druid.indexing.doubleStorage=double
+
+    #
+    # Security
+    #
+    druid.server.hiddenProperties=["druid.s3.accessKey","druid.s3.secretKey","druid.metadata.storage.connector.password"]
+
+
+    #
+    # SQL
+    #
+    druid.sql.enable=true
+
+    #
+    # Lookups
+    #
+    druid.lookup.enableLookupSyncOnStartup=true
+  historical: |
+    druid.host=localhost
+    druid.service=druid/historical
+    druid.plaintextPort=8083
+
+    # HTTP server threads
+    druid.server.http.numThreads={{.Values.historical.config.httpNumThreads}}
+
+    # Processing threads and buffers
+    druid.processing.buffer.sizeBytes={{.Values.historical.config.sizeBytesBuffer | replace "_" ""}}
+    druid.processing.numMergeBuffers={{.Values.historical.config.numMergeBuffers}}
+    druid.processing.numThreads={{.Values.historical.config.numThreads}}
+    druid.processing.tmpDir=var/druid/processing
+
+    # Segment storage
+    druid.segmentCache.locations=[{"path":"var/druid/segment-cache","maxSize":300000000000}]
+    druid.server.maxSize={{.Values.historical.config.maxSize | replace "_" ""}}
+
+    # Query cache
+    druid.historical.cache.useCache=true
+    druid.historical.cache.populateCache=true
+    druid.cache.type=caffeine
+    druid.cache.sizeInBytes={{.Values.historical.config.sizeBytesCache | replace "_" ""}}
+
+  middleManager: |
+    druid.host=localhost
+    druid.service=druid/middleManager
+    druid.plaintextPort=8091
+
+    # Number of tasks per middleManager
+    druid.worker.capacity={{.Values.middlemanager.config.workerCapacity}}
+
+    # Task launch parameters
+    druid.indexer.runner.javaOpts={{.Values.middlemanager.config.javaOpts}}
+    druid.indexer.task.baseTaskDir=var/druid/task
+
+    # HTTP server threads
+    druid.server.http.numThreads={{.Values.middlemanager.config.httpNumThreads}}
+
+    # Processing threads and buffers on Peons
+    druid.indexer.fork.property.druid.processing.numMergeBuffers={{.Values.middlemanager.config.numMergeBuffers}}
+    druid.indexer.fork.property.druid.processing.buffer.sizeBytes={{.Values.middlemanager.config.sizeBytesBuffer | replace "_" ""}}
+    druid.indexer.fork.property.druid.processing.numThreads={{.Values.middlemanager.config.processingNumThreads}}
+
+    # Hadoop indexing
+    druid.indexer.task.hadoopWorkingPath=var/druid/hadoop-tmp
+
+  coordinator: |
+    druid.host=localhost
+    druid.service=druid/coordinator
+    druid.plaintextPort=8081
+
+    druid.coordinator.startDelay=PT10S
+    druid.coordinator.period=PT5S
+
+    # Run the overlord service in the coordinator process
+    druid.coordinator.asOverlord.enabled=true
+    druid.coordinator.asOverlord.overlordService=druid/overlord
+
+    druid.indexer.queue.startDelay=PT5S
+
+    {{- if .Values.localPersistence }}
+    druid.indexer.runner.type=local
+    {{- else }}
+    druid.indexer.runner.type=remote
+    {{- end }}
+    druid.indexer.storage.type=metadata
+
+  broker: |
+    druid.host=localhost
+    druid.service=druid/broker
+    druid.plaintextPort=8082
+
+    # HTTP server settings
+    druid.server.http.numThreads={{.Values.broker.config.httpNumThreads}}
+
+    # HTTP client settings
+    druid.broker.http.numConnections={{.Values.broker.config.numConnections}}
+    druid.broker.http.maxQueuedBytes={{.Values.broker.config.maxQueuedBytes | replace "_" ""}}
+
+    # Processing threads and buffers
+    # REMOVED A 0 FOR LOCAL VERSION
+    druid.processing.buffer.sizeBytes={{.Values.broker.config.sizeBytesBuffer | replace "_" ""}}
+    druid.processing.numMergeBuffers={{.Values.broker.config.numMergeBuffers}}
+    druid.processing.numThreads={{.Values.broker.config.numThreads}}
+    druid.processing.tmpDir=var/druid/processing
+
+    # Query cache disabled -- push down caching and merging instead
+    druid.broker.cache.useCache=false
+    druid.broker.cache.populateCache=false
+  
+  router: |
+    druid.host=localhost
+    druid.service=druid/router
+    druid.plaintextPort=8888
+
+    # HTTP proxy
+    druid.router.http.numConnections={{.Values.router.config.numConnections}}
+    druid.router.http.readTimeout=PT5M
+    druid.router.http.numMaxThreads={{.Values.router.config.numMaxThreads}}
+    druid.server.http.numThreads={{.Values.router.config.numThreads}}
+
+    # Service discovery
+    druid.router.defaultBrokerServiceName=druid/broker
+    druid.router.coordinatorServiceName=druid/coordinator
+
+    # Management proxy to coordinator / overlord: required for unified web console.
+    druid.router.managementProxy.enabled=true

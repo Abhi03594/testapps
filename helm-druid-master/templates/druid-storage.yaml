@@ -1,0 +1,13 @@
+{{- if .Values.localPersistence }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: druidstore
+spec:
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+        requests:
+            storage: 100Mi
+{{- end }}

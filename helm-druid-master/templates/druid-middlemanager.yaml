@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-middlemanager-service
+spec:
+  type: ClusterIP
+  ports:
+  - name: "middlemanager"
+    port: {{ .Values.middlemanager.port }}
+    targetPort: {{ .Values.middlemanager.port }}
+  selector:
+    app: {{ include "druid.name" . }}-middlemanager
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-middlemanager
+    chart: {{ include "druid.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "druid.name" . }}-middlemanager
+spec:
+  replicas: {{ .Values.middlemanager.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-middlemanager
+  serviceName: "druid-middlemanager-service"
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-middlemanager
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: druid_host
+          value: $(POD_NAME).druid-middlemanager-service.$(POD_NAMESPACE).svc.cluster.local
+        - name: DRUID_XMS
+          value: {{ .Values.middlemanager.xms }}
+        - name: DRUID_XMX
+          value: {{ .Values.middlemanager.xmx }}
+        {{- if .Values.middlemanager.maxDirectMemorySize }}
+        - name: DRUID_MAXDIRECTMEMORYSIZE
+          value: {{ .Values.middlemanager.maxDirectMemorySize }}
+        {{- end }}
+        {{- if .Values.middlemanager.maxNewSize }}
+        - name: DRUID_MAXNEWSIZE
+          value: {{ .Values.middlemanager.maxNewSize }}
+        {{- end }}
+        {{- if .Values.middlemanager.maxSize }}
+        - name: DRUID_MAXSIZE
+          value: {{ .Values.middlemanager.maxSize }}
+        {{- end }}
+        {{- if .Values.awsRegion }}
+        - name: AWS_REGION
+          value: {{ .Values.awsRegion }}
+        {{- end }}
+        {{- if eq .Values.indexer.type "s3" }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_access_key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_secret_access_key
+        {{- end }}
+        {{- if eq .Values.metadataStorage.type "postgresql" }}
+        - name: METADATA_STORAGE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["{{.Values.entryPoint}}"]
+        args: ["{{.Values.middlemanager.args}}"]
+        name: {{ include "druid.name" . }}-middlemanager
+        ports:
+        - name: "middlemanager"
+          containerPort: {{ .Values.middlemanager.port }}
+        resources:
+          {{- with .Values.middlemanager.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+          - name: middlemanager-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/_common/common.runtime.properties
+            subPath: common.runtime.properties
+          - name: middlemanager-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/data/middleManager/runtime.properties
+            subPath: runtime.properties
+      volumes:
+        - name: middlemanager-conf
+          configMap:
+            name: druid
+            items:
+            - key: common
+              path: common.runtime.properties
+            - key: middleManager
+              path: runtime.properties
+      restartPolicy: {{ .Values.middlemanager.restartPolicy }}
+status:
+  replicas: {{ .Values.middlemanager.replicas }}

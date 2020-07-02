@@ -1,0 +1,263 @@
+image:
+  repository: apache/druid
+  tag: 0.17.0
+
+# should really never change unless you mount a custom bash script
+entryPoint: "/druid.sh"
+# TODO: For some reason aws region has to be set even if you aren't using it.
+awsRegion: us-east-2
+# set to true if you want the segemnts to live on disk instead of s3 / hdfs
+localPersistence: false
+
+# if set to true, it will install all of druid and zk in one single pod. Good for local dev.
+extensions: "[\"druid-kafka-indexing-service\", \"druid-datasketches\", \"druid-protobuf-extensions\", \"postgresql-metadata-storage\", \"druid-s3-extensions\", \"druid-lookups-cached-global\", \"druid-kafka-extraction-namespace\"]"
+
+zookeeper:
+  host: druid-zookeeper:2181
+  pathsBase: /druid
+
+metadataStorage:
+  # derby, postgresql, mysql
+  type: "postgresql"
+  # !!!!!!!!!!!!!!!!!!!!!!!
+  # if using derby make sure to change default to your namespace
+  # !!!!!!!!!!!!!!!!!!!!!!!
+  connectURI: jdbc:postgresql://druid-postgres.default.svc.cluster.local/postgres
+  # only needed for mysql / postgres. Password is set in secret
+  user: druid
+  # only needed for derby
+  # !!!!!!!!!!!!!!!!!!!!!!!
+  # if using derby make sure to change default to your namespace
+  # !!!!!!!!!!!!!!!!!!!!!!!
+  host: druid-coordinator-service.default.svc.cluster.local
+  port: 1527
+
+segmentStorage:
+  type: "s3"
+  # only needed for local / hdfs
+  storageDirectory: var/druid_segments/segments
+  # only needed for s3
+  bucket: your-bucket
+  baseKey: druid/segments
+
+indexer:
+  type: "s3"
+  # only needed for local / hdfs
+  directory: var/druid/indexing-logs
+  # only needed for s3
+  s3Bucket: your-bucket
+  s3Prefix: druid/indexing-logs
+
+router:
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 500Mi
+    limits:
+      cpu: 0.5
+      memory: 500Mi
+  replicas: 1
+  restartPolicy: Always
+  port: 8888
+  # args to entrypoint
+  args: "router"
+  xmx: 500m
+  xms: 500m
+  maxDirectMemorySize: 6172m
+  maxNewSize: 250m
+  maxSize: 250m
+  config:
+    numConnections: 25
+    numMaxThreads: 50
+    numThreads: 50
+  livenessProbe:
+    httpGet:
+      path: /status/health
+      port: 8888
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    httpGet:
+      path: /status/health
+      port: 8888
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+
+broker:
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 1Gi
+    limits:
+      cpu: 0.5
+      memory: 1Gi
+  replicas: 1
+  restartPolicy: Always
+  port: 8082
+  # args to entrypoint
+  args: "broker"
+  xmx: 500m
+  xms: 500m
+  maxDirectMemorySize: 6172m
+  maxNewSize: 250m
+  maxSize: 250m
+  awsRegion: us-east-1
+  config:
+    httpNumThreads: 6
+    numConnections: 5
+    maxQueuedBytes: _5000000
+    sizeBytesBuffer: _50000000
+    numMergeBuffers: 2
+    numThreads: 1
+  livenessProbe:
+    httpGet:
+      path: /status/health
+      port: 8082
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    httpGet:
+      path: /status/health
+      port: 8082
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+
+coordinator:
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  replicas: 1
+  restartPolicy: Always
+  port: 8081
+  # args to entrypoint
+  args: "coordinator"
+  xmx: 256m
+  xms: 256m
+  livenessProbe:
+    httpGet:
+      path: /status/health
+      port: 8081
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    httpGet:
+      path: /status/health
+      port: 8081
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+
+historical:
+  resources:
+    requests:
+      cpu: 1
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1Gi
+  replicas: 1
+  restartPolicy: Always
+  port: 8083
+  # args to entrypoint
+  args: "historical"
+  xmx: 512m
+  xms: 512m
+  maxDirectMemorySize: 400m
+  config:
+    # large ints must have the underscore or else helm templatse with scientific notation
+    sizeBytesBuffer: _50000000
+    httpNumThreads: 6
+    numMergeBuffers: 2
+    numThreads: 1
+    maxSize: _300000000000
+    sizeBytesCache: _50000000
+  livenessProbe:
+    httpGet:
+      path: /status/health
+      port: 8083
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    httpGet:
+      path: /status/health
+      port: 8083
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+
+middlemanager:
+  resources:
+    requests:
+      cpu: 0.5
+      memory: 1Gi
+    limits:
+      cpu: 0.5
+      memory: 1Gi
+  replicas: 1
+  restartPolicy: Always
+  port: 8091
+  # args to entrypoint
+  args: "middleManager"
+  xmx: 500m
+  xms: 500m
+  maxDirectMemorySize: 6172m
+  maxNewSize: 250m
+  maxSize: 250m
+  config:
+    workerCapacity: 2
+    javaOpts: -server -Xms256m -Xmx256m -XX:MaxDirectMemorySize=300m -Duser.timezone=UTC -Dfile.encoding=UTF-8 -XX:+ExitOnOutOfMemoryError -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager
+    httpNumThreads: 6
+    numMergeBuffers: 2
+    sizeBytesBuffer: _25000000
+    processingNumThreads: 1
+  livenessProbe:
+    httpGet:
+      path: /status/health
+      port: 8091
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+  readinessProbe:
+    httpGet:
+      path: /status/health
+      port: 8091
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 6
+
+postgres:
+  enable: true
+  port: 5432
+  user: druid
+  password: postgres # insecure, dummy data
+  replicas: 1
+  resources:
+    requests: 
+      cpu: 0.5
+      memory: 1Gi
+    limits: 
+      cpu: 0.5
+      memory: 1Gi
+  volume:
+    size: 1Gi 
+    accessMode: ReadWriteOnce

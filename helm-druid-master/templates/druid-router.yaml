@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-router-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "router"
+    port: {{ .Values.router.port }}
+    targetPort: {{ .Values.router.port }}
+  selector:
+    app: {{ include "druid.name" . }}-router
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: {{ include "druid.name" . }}-router
+    chart: {{ include "druid.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ include "druid.name" . }}-router
+spec:
+  replicas: {{ .Values.router.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "druid.name" . }}-router
+  serviceName: "druid-router-service"
+  template:
+    metadata:
+      labels:
+        app: {{ include "druid.name" . }}-router
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: druid_host
+          value: $(POD_NAME).druid-router-service.$(POD_NAMESPACE).svc.cluster.local
+        - name: DRUID_XMS
+          value: {{ .Values.router.xms }}
+        - name: DRUID_XMX
+          value: {{ .Values.router.xmx }}
+        {{- if .Values.router.maxDirectMemorySize }}
+        - name: DRUID_MAXDIRECTMEMORYSIZE
+          value: {{ .Values.router.maxDirectMemorySize }}
+        {{- end }}
+        {{- if .Values.router.maxNewSize }}
+        - name: DRUID_MAXNEWSIZE
+          value: {{ .Values.router.maxNewSize }}
+        {{- end }}
+        {{- if .Values.router.maxSize }}
+        - name: DRUID_MAXSIZE
+          value: {{ .Values.router.maxSize }}
+        {{- end }}
+        {{- if .Values.awsRegion }}
+        - name: AWS_REGION
+          value: {{ .Values.awsRegion }}
+        {{- end }}
+        {{- if eq .Values.indexer.type "s3" }}
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_access_key
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: s3_secret_access_key
+        {{- end }}
+        {{- if eq .Values.metadataStorage.type "postgresql" }}
+        - name: METADATA_STORAGE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: druid
+              key: postgres_password
+        {{- end }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["{{.Values.entryPoint}}"]
+        args: ["{{.Values.router.args}}"]
+        name: {{ include "druid.name" . }}-router
+        ports:
+        - name: "router"
+          containerPort: {{ .Values.router.port }}
+        resources:
+          {{- with .Values.router.resources }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+          - name: router-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/_common/common.runtime.properties
+            subPath: common.runtime.properties
+          - name: router-conf
+            mountPath: /opt/apache-druid-0.17.0/conf/druid/cluster/query/router/runtime.properties
+            subPath: runtime.properties
+      volumes:
+        - name: router-conf
+          configMap:
+            name: druid
+            items:
+            - key: common
+              path: common.runtime.properties
+            - key: router
+              path: runtime.properties
+      restartPolicy: {{ .Values.router.restartPolicy }}
+status:
+  replicas: {{ .Values.router.replicas }}
