@@ -1,0 +1,20 @@
+To connect to your Cassandra cluster using CQL:
+
+To get your password run:
+
+   export CASSANDRA_PASSWORD=$(kubectl get secret --namespace {{.Values.namespace}} {{ template "cassandra.fullname" . }} -o jsonpath="{.data.cassandra-password}" | base64 --decode)
+
+1. Run a Cassandra pod that you can use as a client:
+
+   kubectl run --namespace {{.Values.namespace}} {{ template "cassandra.fullname" . }}-client --rm --tty -i --restart='Never' \
+   --env CASSANDRA_PASSWORD=$CASSANDRA_PASSWORD \
+   --image cassandra:3.11.6 -- bash
+
+2. Connect using the cqlsh client:
+
+    cqlsh -u {{ .Values.dbUser.user }} -p $CASSANDRA_PASSWORD {{ template "cassandra.fullname" . }}
+
+
+
+
+

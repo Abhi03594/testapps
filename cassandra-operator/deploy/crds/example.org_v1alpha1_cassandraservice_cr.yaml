@@ -1,0 +1,124 @@
+apiVersion: example.org/v1alpha1
+kind: CassandraService
+metadata:
+  name: example-cassandraservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/cassandra/values.yaml
+  
+  affinity: {}
+  argsOverrides: []
+  backup:
+    annotations:
+      iam.amazonaws.com/role: cain
+    destination: s3://bucket/cassandra
+    enabled: false
+    env:
+    - name: AWS_REGION
+      value: us-east-1
+    extraArgs: []
+    image:
+      repository: maorfr/cain
+      tag: 0.6.0
+    resources:
+      limits:
+        cpu: 1
+        memory: 1Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+    schedule:
+    - cron: 0 7 * * *
+      keyspace: keyspace1
+    - cron: 30 7 * * *
+      keyspace: keyspace2
+  commandOverrides: []
+  config:
+    cluster_domain: cluster.local
+    cluster_name: cassandra
+    cluster_size: 1
+    dc_name: DC1
+    endpoint_snitch: SimpleSnitch
+    heap_new_size: 512M
+    max_heap_size: 2048M
+    num_tokens: 256
+    ports:
+      cql: 9042
+      thrift: 9160
+    rack_name: RAC1
+    seed_size: 1
+    start_rpc: true
+  configOverrides: {}
+  dbUser:
+    password: null
+    user: cassandra
+  env: {}
+  exporter:
+    enabled: false
+    image:
+      repo: criteord/cassandra_exporter
+      tag: 2.0.2
+    jvmOpts: ""
+    port: 5556
+    resources: {}
+    servicemonitor: true
+  hostNetwork: false
+  hpa:
+    enabled: true
+  image:
+    pullPolicy: IfNotPresent
+    repo: cassandra
+    tag: 3.11.6
+  livenessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 90
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 5
+  namespace: cassandra
+  persistence:
+    accessMode: ReadWriteOnce
+    enabled: true
+    size: 30Gi
+  podAnnotations: {}
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podLabels: {}
+  podManagementPolicy: OrderedReady
+  podSettings:
+    terminationGracePeriodSeconds: 30
+  rbac:
+    create: true
+  readinessProbe:
+    address: ${POD_IP}
+    failureThreshold: 3
+    initialDelaySeconds: 90
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 5
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+  securityContext:
+    enabled: true
+    fsGroup: 999
+    runAsUser: 999
+  service:
+    annotations: {}
+    nodePorts:
+      cql: ""
+      thriftPort: ""
+    ports:
+      cql: 9042
+    thriftPort: 9160
+    type: ClusterIP
+  serviceAccount:
+    create: true
+  tolerations: []
+  updateStrategy:
+    type: OnDelete
+  
