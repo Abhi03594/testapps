@@ -1,0 +1,11 @@
+To get your password run:
+
+   export db_pswd=$(kubectl get secret --namespace {{ .Values.namespace }} {{ template "influxdb.fullname" . }}-auth -o jsonpath="{.data.influxdb-password}" | base64 --decode)
+
+
+To connect to your database run the following commands:
+
+kubectl run {{ include "influxdb.fullname" . }}-client --rm --tty -i --restart='Never' --namespace {{ .Values.namespace }} --env="INFLUX_USERNAME=admin" --env="INFLUX_PASSWORD=$db_pswd" --image influxdb:1.7.9-alpine --command -- influx -host {{ include "influxdb.fullname" . }} -port 8086
+
+
+

@@ -1,0 +1,19 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: "{{ template "influxdb.fullname" . }}"
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: "{{ template "influxdb.fullname" . }}"
+    chart: "{{ template "influxdb.chart" . }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ template "influxdb.fullname" . }}"
+      component: scheduler
+      release: {{ .Release.Name }}
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}
