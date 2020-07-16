@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  suitecrm:
+    build: ./suitecrm 
+    depends_on:
+    - openldap
+    - mysql
+    ports:
+    - "3000:3000"
+    tty: true
+    environment:
+    - CURRENCY_ISO4217=MXN
+    - CURRENCY_NAME=MX Peso
+    - DATE_FORMAT=d-m-Y
+    - EXPORT_CHARSET=ISO-8859-1
+    - DEFAULT_LANGUAGE=en_us
+    - DATABASE_TYPE=mysql
+    - DATABASE_HOST=mysql
+    - DB_ADMIN_PASSWORD=secret
+    - DB_ADMIN_USERNAME=admin
+    - DATABASE_NAME=suitecrmdb
+    - SITE_USERNAME=admin
+    - SITE_PASSWORD=password
+    - SITE_URL=http://
+    - SYSTEM_NAME=Zentek CRM
+
+  openldap:
+    build: ./openldap
+    ports:
+    - "389:389"
+    volumes:
+    - ldap-volume:/var/lib/ldap:Z
+
+  mysql:
+    build: ./mysql
+    ports:
+    - "3306:3306"
+    volumes:
+    - mysql-volume:/var/lib/mysql:Z
+    environment:
+    - MYSQL_USER=admin
+    - MYSQL_PASSWORD=secret
+    - MYSQL_ROOT_PASSWORD=secret
+    - MYSQL_DATABASE=suitecrmdb
+
+  elasticsearch:
+    build: ./elasticsearch
+    ports:
+    - "9200:9200"
+    volumes:
+    - elasticsearch-volume:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    environment:
+    - bootstrap.memory_lock=true
+    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  
+
+volumes:
+    ldap-volume:
+    mysql-volume:
+    elasticsearch-volume:
+
