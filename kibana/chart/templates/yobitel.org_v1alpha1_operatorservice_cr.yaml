@@ -1,0 +1,71 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OperatorService
+metadata:
+  name: example-operatorservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/kibana/values.yaml
+  
+  affinity: {}
+  elasticsearch:
+    enabled: true
+  elasticsearchHosts: http://elasticsearch-master:9200
+  elasticsearchURL: ""
+  extraEnvs: []
+  filebeat:
+    enabled: true
+  fullnameOverride: ""
+  healthCheckPath: /app/kibana
+  hpa:
+    enabled: true
+  httpPort: 5601
+  image: kibana
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  imageTag: 7.8.0
+  kibanaConfig: {}
+  labels: {}
+  lifecycle: {}
+  logstash:
+    enabled: true
+  maxUnavailable: 1
+  nameOverride: ""
+  namespace: elk
+  nodeSelector: {}
+  podAnnotations: {}
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podSecurityContext:
+    fsGroup: 1000
+  priorityClassName: ""
+  protocol: http
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 3
+    timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  secretMounts: []
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    runAsNonRoot: true
+    runAsUser: 1000
+  serverHost: 0.0.0.0
+  service:
+    annotations: {}
+    port: 5601
+    type: LoadBalancer
+  tolerations: []
+  updateStrategy:
+    type: Recreate
+  

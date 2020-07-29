@@ -1,0 +1,16 @@
+dependencies:
+- name: elasticsearch
+  version: ^1.32.0
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: elasticsearch.enabled
+- name: filebeat
+  version: ^3.1.1
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: filebeat.enabled
+- name: logstash
+  version: ^2.3.0
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: logstash.enabled
+
+
+

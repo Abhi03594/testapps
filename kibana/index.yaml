@@ -1,0 +1,26 @@
+apiVersion: v1
+entries:
+  elk:
+  - apiVersion: v1
+    appVersion: 7.8.0
+    created: "2020-07-28T13:22:56.235174573+05:30"
+    dependencies:
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ^1.32.0
+    - condition: filebeat.enabled
+      name: filebeat
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ^3.1.1
+    - condition: logstash.enabled
+      name: logstash
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: ^2.3.0
+    description: ElasticSearch-Logstash-Kibana stack helm chart
+    digest: 27646f2331c8254f626f87e17a161ec09b843165db46485288fc03d2491885e5
+    name: elk
+    urls:
+    - elk-1.tgz
+    version: "1"
+generated: "2020-07-28T13:22:56.227737555+05:30"

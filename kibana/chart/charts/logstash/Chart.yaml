@@ -1,0 +1,9 @@
+apiVersion: v1
+description: Official Elastic helm chart for Logstash
+home: https://github.com/elastic/helm-charts
+name: logstash
+version: 1.0
+appVersion: 7.1.1
+sources:
+  - https://github.com/elastic/logstash
+icon: https://helm.elastic.co/icons/logstash.png

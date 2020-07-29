@@ -1,0 +1,20 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name | quote }}
+    {{- range $key, $value := .Values.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      component: scheduler
+      release: {{ .Release.Name | quote }}
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}

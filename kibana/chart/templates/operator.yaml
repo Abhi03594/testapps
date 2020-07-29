@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elk-operator
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: elk-operator
+  template:
+    metadata:
+      labels:
+        name: elk-operator
+    spec:
+      serviceAccountName: elk-operator
+      containers:
+        - name: elk-operator
+          # Replace this with the built image name
+          image: yobitel/elk-ope:7.8.0
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "elk-operator"
