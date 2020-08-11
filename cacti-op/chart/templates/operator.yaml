@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cacti-operator
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: cacti-operator
+  template:
+    metadata:
+      labels:
+        name: cacti-operator
+    spec:
+      serviceAccountName: cacti-operator
+      containers:
+        - name: cacti-operator
+          # Replace this with the built image name
+          image: yobitel/cacti-operator:1.2.14
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "cacti-operator"
