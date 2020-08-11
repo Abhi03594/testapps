@@ -1,0 +1,33 @@
+affinity: {}
+fullnameOverride: ""
+hpa:
+  enabled: true
+image: yobitel/cacti
+imagePullSecrets: []
+imageTag: "1.0"
+imagepullPolicy: IfNotPresent
+nameOverride: ""
+namespace: cacti
+nodeSelector: {}
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  size: 300Gi
+podDisruptionBudget:
+  maxUnavailable: 1
+podDisruptionBudgetEnabled: true
+podSecurityContext:
+  fsGroup: 2000
+  runAsUser: 2000
+replicaCount: 1
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 500Mi
+service:
+  port: 80
+  type: LoadBalancer
+tolerations: []
