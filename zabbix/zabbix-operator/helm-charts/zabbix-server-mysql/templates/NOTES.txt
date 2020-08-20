@@ -1,0 +1,21 @@
+You can login to the admin panel using the following initial credentials (if
+not changed yet):
+
+        Username: Admin
+        Password: zabbix
+
+        !!! Please change the password after 1st login !!!
+
+
+1. Get the Zabbix URL by running these commands:
+
+
+{{- if contains "LoadBalancer" .Values.service.zabbix_web_nginx_mysql.type }}
+
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+        Watch the status with: 'kubectl get svc --namespace {{ .Values.namespace }} -w {{ template "zabbix-web-nginx-mysql.fullname" . }}'
+
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "zabbix-web-nginx-mysql.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+   echo "Zabbix URL: http://$SERVICE_IP:{{ .Values.service.zabbix_web_nginx_mysql.port }}{{ end }}/"
+
+

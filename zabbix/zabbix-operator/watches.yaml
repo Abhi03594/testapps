@@ -1,0 +1,5 @@
+---
+- version: v1alpha1
+  group: yobitel.org
+  kind: ZabbixService
+  chart: helm-charts/zabbix-server-mysql

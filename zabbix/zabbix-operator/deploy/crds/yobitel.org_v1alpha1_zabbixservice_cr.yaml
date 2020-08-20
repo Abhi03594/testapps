@@ -1,0 +1,200 @@
+apiVersion: yobitel.org/v1alpha1
+kind: ZabbixService
+metadata:
+  name: example-zabbixservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/zabbix-server-mysql/values.yaml
+  
+  affinity: {}
+  fullnameOverride: {}
+  hpa:
+    enabled: true
+  image:
+    zabbix_agent:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: zabbix/zabbix-agent
+      tag: ubuntu-4.4-latest
+    zabbix_server_mysql:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: zabbix/zabbix-server-mysql
+      tag: ubuntu-4.4-latest
+    zabbix_web_nginx_mysql:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: zabbix/zabbix-web-nginx-mysql
+      tag: ubuntu-4.4-latest
+  ingress:
+    annotations: {}
+    enabled: false
+    hostname: zabbix.local
+    tls: []
+  mariadb:
+    db:
+      name: zabbix
+      password: zabbix
+      user: zabbix
+    master:
+      config: |-
+        [mysqld]
+        skip-name-resolve
+        explicit_defaults_for_timestamp
+        basedir=/opt/bitnami/mariadb
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+        tmpdir=/opt/bitnami/mariadb/tmp
+        max_allowed_packet=16M
+        bind-address=0.0.0.0
+        pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
+        log-error=/opt/bitnami/mariadb/logs/mysqld.log
+        character-set-server=UTF8
+        collation-server=utf8_bin
+  
+        [client]
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+        default-character-set=UTF8
+  
+        [manager]
+        port=3306
+        socket=/opt/bitnami/mariadb/tmp/mysql.sock
+      persistence:
+        accessMode: ReadWriteOnce
+        enabled: true
+        size: 8Gi
+    replication:
+      enabled: false
+    rootUser:
+      password: zabbix
+  nameOverride: {}
+  namespace: zabbix
+  nodeSelector: {}
+  persistence:
+    alertscripts:
+      accessMode: ReadWriteOnce
+      claimName: alertscripts
+      enabled: false
+      size: 100Mi
+    enc:
+      accessMode: ReadWriteOnce
+      claimName: enc
+      enabled: false
+      size: 100Mi
+    externalscripts:
+      accessMode: ReadWriteOnce
+      claimName: externalscripts
+      enabled: false
+      size: 100Mi
+    mibs:
+      accessMode: ReadWriteOnce
+      claimName: mibs
+      enabled: false
+      size: 100Mi
+    modules:
+      accessMode: ReadWriteOnce
+      claimName: modules
+      enabled: false
+      size: 100Mi
+    snmptraps:
+      accessMode: ReadWriteOnce
+      claimName: snmptraps
+      enabled: false
+      size: 100Mi
+    ssh_keys:
+      accessMode: ReadWriteOnce
+      claimName: ssh-keys
+      enabled: false
+      size: 100Mi
+    ssl:
+      certs:
+        accessMode: ReadWriteOnce
+        claimName: ssl-certs
+        enabled: false
+        size: 100Mi
+      keys:
+        accessMode: ReadWriteOnce
+        claimName: ssl-keys
+        enabled: false
+        size: 100Mi
+      ssl_ca:
+        accessMode: ReadWriteOnce
+        claimName: ssl-ssl-ca
+        enabled: false
+        size: 100Mi
+    userscripts:
+      accessMode: ReadWriteOnce
+      claimName: userscripts
+      enabled: false
+      size: 200Mi
+  podAnnotations: {}
+  podDisruptionBudget:
+    minAvailable: 1
+  replicaCount:
+    zabbix_web_nginx_mysql: 2
+  resources:
+    requests:
+      cpu: 300m
+      memory: 512Mi
+  securityContext:
+    runAsUser: 1000
+  service:
+    zabbix_server_mysql:
+      port: 10051
+      type: ClusterIP
+    zabbix_web_nginx_mysql:
+      port: 80
+      type: LoadBalancer
+  tolerations: []
+  updateStrategy:
+    zabbix_server_mysql:
+      type: Recreate
+    zabbix_web_nginx_mysql:
+      type: RollingUpdate
+  zabbix_agent_probes:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    readinessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+  zabbix_server_mysql_probes:
+    livenessProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    readinessProbe:
+      failureThreshold: 60
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+  zabbix_vars:
+    php_tz: Europe/Riga
+    zbx_enableremotecommands: "0"
+    zbx_logremotecommands: "0"
+    zbx_server_name: zabbix
+    zbx_timeout: 3
+    zbx_unsafeuserparameters: "0"
+  zabbix_web_nginx_probes:
+    livenessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    readinessProbe:
+      failureThreshold: 6
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+  

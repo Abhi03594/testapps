@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: {{ template "zabbix-web.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ template "zabbix-web-nginx-mysql.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: "{{ template "zabbix-web-nginx-mysql.fullname" . }}"
+    chart: "{{ template "zabbix.chart" . }}"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+  {{- if .Values.ingress.hostname }}
+  - host: {{ .Values.ingress.hostname }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: "{{ template "zabbix-web-nginx-mysql.fullname" $ }}"
+          servicePort: http
+  {{- end }}
+  tls:
+{{ toYaml .Values.ingress.tls | indent 4 }}
+{{- end }}

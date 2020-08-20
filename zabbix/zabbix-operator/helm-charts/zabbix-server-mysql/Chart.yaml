@@ -1,0 +1,26 @@
+apiVersion: v1
+appVersion: 4.4.0-latest
+dependencies:
+- condition: mariadb.enabled
+  name: mariadb
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  tags:
+  - zabbix-database
+  version: 6.x.x
+description: Zabbix monitoring server
+home: https://www.zabbix.com/
+icon: https://cdn.lo4d.com/t/icon/70/zabbix.png
+keywords:
+- zabbix
+- zabbix-server
+- zabbix-server-mysql
+- monitoring
+- application
+- php
+maintainers:
+- email: elmanytas@gmail.com
+  name: elmanytas
+name: zabbix-server-mysql
+sources:
+- https://github.com/elmanytas/zabbix-kubernetes
+version: 0.0.5
