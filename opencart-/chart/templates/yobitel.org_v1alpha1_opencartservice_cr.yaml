@@ -1,0 +1,42 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OpencartService
+metadata:
+  name: example-opencartservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/opencart/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  hpa:
+    enable: true
+  image: yobitel/opencart
+  imagePullSecrets: []
+  imageTag: 3.0.3.6
+  imagepullPolicy: IfNotPresent
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - host: chart-example.local
+      paths: []
+    tls: []
+  mysql:
+    enable: true
+  nameOverride: ""
+  namespace: observium
+  nodeSelector: {}
+  pdb:
+    enable: true
+  podSecurityContext: {}
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  securityContext:
+    runAsUser: 1000
+  tolerations: []
+  

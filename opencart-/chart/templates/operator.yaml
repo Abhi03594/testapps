@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencart-operator
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: opencart-operator
+  template:
+    metadata:
+      labels:
+        name: opencart-operator
+    spec:
+      serviceAccountName: opencart-operator
+      containers:
+        - name: opencart-operator
+          # Replace this with the built image name
+          image: yobitel/opencart-ope:3.0.3
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "opencart-operator"
