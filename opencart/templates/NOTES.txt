@@ -1,0 +1,17 @@
+Get Opencart dashboard:
+
+fetch the SERVICE_IP of Opencart :
+
+Check whether all the pods are running:
+  
+  $ kubectl get all --namespace {{ .Values.namespace }}
+
+fetch SERVICE_IP once all the pods are scheduled and running 
+
+  $ kubectl get svc --namespace {{ .Values.namespace }}
+
+Opencart dashboard at: http://$SERVICE_IP:80
+
+For further installation refer user manual 
+
+
