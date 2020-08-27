@@ -1,0 +1,104 @@
+apiVersion: yobitel.org/v1alpha1
+kind: MysqlService
+metadata:
+  name: example-mysqlservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/mysql/values.yaml
+  
+  affinity: {}
+  args: []
+  busybox:
+    image: busybox
+    tag: "1.32"
+  configurationFiles: {}
+  configurationFilesPath: /etc/mysql/conf.d/
+  deploymentAnnotations: {}
+  extraInitContainers: |
+    # - name: do-something
+    #   image: busybox
+    #   command: ['do', 'something']
+  extraVolumeMounts: |
+    # - name: extras
+    #   mountPath: /usr/share/extras
+    #   readOnly: true
+  extraVolumes: |
+    # - name: extras
+    #   emptyDir: {}
+  hpa:
+    enabled: true
+  image: yobitel/mysql
+  imagePullPolicy: IfNotPresent
+  imageTag: 8.0.21
+  initContainer:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 10Mi
+  initializationFiles: {}
+  livenessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  metrics:
+    annotations: {}
+    enabled: false
+    flags: []
+    image: prom/mysqld-exporter
+    imagePullPolicy: IfNotPresent
+    imageTag: v0.10.0
+    livenessProbe:
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+    readinessProbe:
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+    resources: {}
+    serviceMonitor:
+      additionalLabels: {}
+      enabled: false
+  namespace: mysql
+  nodeSelector: {}
+  persistence:
+    accessMode: ReadWriteOnce
+    annotations: {}
+    enabled: true
+    size: 8Gi
+  podAnnotations: {}
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podLabels: {}
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  securityContext:
+    enabled: false
+    fsGroup: 999
+    runAsUser: 999
+  service:
+    annotations: {}
+    port: 3306
+    type: ClusterIP
+  ssl:
+    certificates: null
+    enabled: false
+    secret: mysql-ssl-certs
+  strategy:
+    type: Recreate
+  testFramework:
+    enabled: true
+    image: bats/bats
+    imagePullPolicy: IfNotPresent
+    securityContext: {}
+    tag: 1.2.1
+  tolerations: []
+  
