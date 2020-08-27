@@ -1,0 +1,49 @@
+# Default values for mongodb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: mongo
+replicaCount: 1
+
+image: mongo:4.2.9
+pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+
+podSecurityContext: 
+  fsGroup: 2000
+  runAsUser: 2000
+
+
+service:
+  type: LoadBalancer
+  port: 27017
+
+hpa:
+  enabled: true
+
+podDisruptionBudgetEnabled: true
+podDisruptionBudget:
+  maxUnavailable: 1
+
+persistence:
+  enabled: true
+
+usePassword: true
+
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

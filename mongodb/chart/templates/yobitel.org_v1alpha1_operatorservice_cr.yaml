@@ -1,0 +1,39 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OperatorService
+metadata:
+  name: example-operatorservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/mongodb/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  hpa:
+    enabled: true
+  image: mongo:4.2.9
+  imagePullSecrets: []
+  nameOverride: ""
+  namespace: mongo
+  nodeSelector: {}
+  persistence:
+    enabled: true
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podSecurityContext:
+    fsGroup: 2000
+    runAsUser: 2000
+  pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  service:
+    port: 27017
+    type: LoadBalancer
+  tolerations: []
+  usePassword: true
+  

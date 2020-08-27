@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 4.2.9
+description: MongoDB is a cross-platform document-oriented database program. Classified
+  as a NoSQL database program, MongoDB uses JSON-like documents with optional schemas.
+name: mongodb
+type: application
+version: "1"
