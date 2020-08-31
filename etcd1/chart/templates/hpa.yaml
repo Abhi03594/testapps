@@ -1,0 +1,38 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "etcd.fullname" . }}
+  namespace: {{ .Values.Namespace }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    app: {{ template "etcd.name" . }}
+    app.kubernetes.io/name: {{ template "etcd.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  maxReplicas: 100
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1beta2
+    kind: statefulset
+    name: {{ template "etcd.fullname" . }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 80
+      #currentCPUUtilizationPercentage: 0
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageValue: 100
+      #currentCPUUtilizationPercentage: 0
+  # Uncomment these lines if you create the custom packets_per_second metric and
+  # configure your app to export the metric.
+  #- type: Pods
+   # pods:
+    #  metricName: packets_per_second
+     # targetAverageValue: 100
+
+

@@ -1,0 +1,46 @@
+affinity: {}
+auth:
+  client:
+    enableAuthentication: false
+    secureTransport: false
+  peer:
+    enableAuthentication: false
+    secureTransport: false
+    useAutoTLS: false
+clientPort: 2379
+component: etcd
+extraEnv: []
+hpa:
+  enabled: true
+image:
+  pullPolicy: IfNotPresent
+  repository: yobitel/docker-etcd
+  tag: 3.4.13
+livenessProbe:
+  initialDelaySeconds: 45
+  periodSeconds: 10
+memoryMode: false
+namespace: etcd
+nodeSelector: {}
+peerPort: 2380
+persistentVolume:
+  enabled: true
+  storage: 1Gi
+podDisruptionBudget:
+  maxUnavailable: 1
+podDisruptionBudgetEnabled: true
+readinessProbe:
+  initialDelaySeconds: 15
+  periodSeconds: 5
+replicas: 3
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+securityContext:
+  fsGroup: 8983
+  runAsUser: 8983
+tolerations: []

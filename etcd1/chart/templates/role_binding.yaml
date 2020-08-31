@@ -1,0 +1,13 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: etcd-operator
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: etcd-operator
+  # Replace this with the namespace the operator is deployed in.
+roleRef:
+  kind: Role
+  name: etcd-operator
+  apiGroup: rbac.authorization.k8s.io
