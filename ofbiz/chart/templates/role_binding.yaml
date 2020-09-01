@@ -1,0 +1,12 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: ofbiz-operator
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: ofbiz-operator
+roleRef:
+  kind: Role
+  name: ofbiz-operator
+  apiGroup: rbac.authorization.k8s.io

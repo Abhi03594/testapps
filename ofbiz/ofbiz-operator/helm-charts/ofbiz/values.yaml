@@ -1,0 +1,41 @@
+affinity: {}
+fullnameOverride: ""
+hpa:
+  enabled: true
+image: yobitel/ofbiz
+imagePullSecrets: []
+imageTag: "16.11"
+imagepullPolicy: IfNotPresent
+ingress:
+  annotations: {}
+  enabled: false
+  hosts:
+  - host: chart-example.local
+    paths: []
+  tls: []
+nameOverride: ""
+namespace: ofbiz
+nodeSelector: {}
+offbizPassword: null
+persistence:
+  accessMode: ReadWriteOnce
+  enabled: true
+  size: 100Gi
+podDisruptionBudget:
+  maxUnavailable: 1
+podDisruptionBudgetEnabled: true
+podSecurityContext:
+  fsGroup: 2000
+replicaCount: 1
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 500Mi
+securityContext: {}
+service:
+  port: 8443
+  type: LoadBalancer
+tolerations: []

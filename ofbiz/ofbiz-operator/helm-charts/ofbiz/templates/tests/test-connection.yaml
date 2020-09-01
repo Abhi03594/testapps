@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ template "ofbiz.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ template "ofbiz.name" . }}
+    chart: {{ template "ofbiz.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args:  ['{{ include "ofbiz.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

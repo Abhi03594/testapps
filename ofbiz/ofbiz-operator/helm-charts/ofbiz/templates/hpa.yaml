@@ -1,0 +1,36 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "ofbiz.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ template "ofbiz.name" . }}
+    chart: {{ template "ofbiz.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  maxReplicas: 100
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1beta2
+    kind: statefulset
+    name: {{ template "ofbiz.fullname" . }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 80
+      #currentCPUUtilizationPercentage: 0
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageValue: 100
+      #currentCPUUtilizationPercentage: 0
+  # Uncomment these lines if you create the custom packets_per_second metric and
+  # configure your app to export the metric.
+  #- type: Pods
+   # pods:
+    #  metricName: packets_per_second
+     # targetAverageValue: 100
+
+
