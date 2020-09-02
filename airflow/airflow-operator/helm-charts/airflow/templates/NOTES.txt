@@ -1,0 +1,12 @@
+Airflow Dashboard:
+
+{{- if contains "LoadBalancer" .Values.web.service.type }}
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+         You can watch the status of the service by running 'kubectl get svc -w {{ include "airflow.fullname" . }}'
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.Namespace }} {{ include "airflow.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+   echo http://$SERVICE_IP:{{ .Values.web.service.externalPort }}/
+
+{{- end }}
+
+

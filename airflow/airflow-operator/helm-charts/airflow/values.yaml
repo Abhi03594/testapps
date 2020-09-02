@@ -1,0 +1,277 @@
+airflow:
+  config: {}
+  executor: CeleryExecutor
+  extraConfigmapMounts: []
+  extraContainers: []
+  extraEnv: []
+  extraPipPackages: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  fernetKey: 7T512UXSSmBOkpWimFHIVb8jK6lfmSAvx4mO6Arehnc=
+  image:
+    pullPolicy: IfNotPresent
+    pullSecret: ""
+    repository: apache/airflow
+    tag: 1.10.10-python3.6
+  podAnnotations: {}
+dags:
+  doNotPickle: false
+  git:
+    gitSync:
+      enabled: false
+      image:
+        pullPolicy: Always
+        repository: alpine/git
+        tag: latest
+      refreshTime: 60
+      resources: {}
+    privateKeyName: id_rsa
+    ref: master
+    repoHost: ""
+    repoPort: 22
+    secret: ""
+    sshKeyscan: false
+    url: ""
+  initContainer:
+    enabled: false
+    image:
+      pullPolicy: Always
+      repository: alpine/git
+      tag: latest
+    mountPath: /dags
+    resources: {}
+    syncSubPath: ""
+  installRequirements: false
+  path: /opt/airflow/dags
+  persistence:
+    accessMode: ReadOnlyMany
+    enabled: false
+    existingClaim: ""
+    size: 1Gi
+    storageClass: ""
+    subPath: ""
+externalDatabase:
+  database: airflow
+  host: localhost
+  passwordSecret: ""
+  passwordSecretKey: postgresql-password
+  port: 5432
+  properties: ""
+  type: postgres
+  user: airflow
+externalRedis:
+  databaseNumber: 1
+  host: localhost
+  passwordSecret: ""
+  passwordSecretKey: redis-password
+  port: 6379
+extraManifests: []
+flower:
+  affinity: {}
+  annotations: {}
+  basicAuthSecret: ""
+  basicAuthSecretKey: ""
+  enabled: true
+  extraConfigmapMounts: []
+  initialStartupDelay: 0
+  labels: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  resources: {}
+  service:
+    annotations: {}
+    externalPort: 5555
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    nodePort:
+      http: ""
+    type: ClusterIP
+  tolerations: []
+  urlPrefix: ""
+ingress:
+  enabled: false
+  flower:
+    annotations: {}
+    host: ""
+    livenessPath: ""
+    path: ""
+    tls:
+      enabled: false
+      secretName: ""
+  web:
+    annotations: {}
+    host: ""
+    livenessPath: ""
+    path: ""
+    precedingPaths: []
+    succeedingPaths: []
+    tls:
+      enabled: false
+      secretName: ""
+logs:
+  path: /opt/airflow/logs
+  persistence:
+    accessMode: ReadWriteMany
+    enabled: false
+    existingClaim: ""
+    size: 1Gi
+    storageClass: ""
+    subPath: ""
+namespace: airflow
+postgresql:
+  enabled: true
+  existingSecret: ""
+  existingSecretKey: postgresql-password
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    enabled: true
+    size: 8Gi
+    storageClass: ""
+  postgresqlDatabase: airflow
+  postgresqlPassword: airflow
+  postgresqlUsername: postgres
+prometheusRule:
+  additionalLabels: {}
+  enabled: false
+  groups: []
+rbac:
+  create: true
+redis:
+  cluster:
+    enabled: false
+    slaveCount: 1
+  enabled: false
+  existingSecret: ""
+  existingSecretKey: redis-password
+  master:
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      enabled: false
+      size: 8Gi
+      storageClass: ""
+    resources: {}
+  password: airflow
+  slave:
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      enabled: false
+      size: 8Gi
+      storageClass: ""
+    resources: {}
+scheduler:
+  affinity: {}
+  annotations: {}
+  connections: []
+  extraInitContainers: []
+  initdb: true
+  initialStartupDelay: 0
+  labels: {}
+  nodeSelector: {}
+  numRuns: -1
+  podAnnotations: {}
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 100%
+    minAvailable: ""
+  podLabels: {}
+  pools: |
+    {}
+  preinitdb: false
+  refreshConnections: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  tolerations: []
+  variables: |
+    {}
+serviceAccount:
+  annotations: {}
+  create: true
+  name: ""
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  path: /admin/metrics
+  selector:
+    prometheus: kube-prometheus
+web:
+  affinity: {}
+  annotations: {}
+  baseUrl: http://localhost:8080
+  extraPipPackages: []
+  initialStartupDelay: 0
+  labels: {}
+  livenessProbe:
+    enabled: true
+    failureThreshold: 2
+    initialDelaySeconds: 300
+    periodSeconds: 30
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 3
+  minReadySeconds: 5
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  readinessProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    scheme: HTTP
+    successThreshold: 1
+    timeoutSeconds: 1
+  replicas: 1
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  secrets: []
+  secretsDir: /var/airflow/secrets
+  secretsMap: null
+  serializeDAGs: false
+  service:
+    annotations: {}
+    externalPort: 8080
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    nodePort:
+      http: ""
+    sessionAffinityConfig: {}
+    type: LoadBalancer
+  tolerations: []
+workers:
+  affinity: {}
+  annotations: {}
+  autoscaling:
+    enabled: false
+    maxReplicas: 2
+    metrics: []
+  celery:
+    gracefullTermination: false
+    gracefullTerminationPeriod: 600
+    instances: 1
+  enabled: true
+  initialStartupDelay: 0
+  labels: {}
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  replicas: 1
+  resources: {}
+  secrets: []
+  secretsDir: /var/airflow/secrets
+  secretsMap: null
+  terminationPeriod: 60
+  tolerations: []
