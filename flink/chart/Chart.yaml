@@ -1,0 +1,6 @@
+apiVersion: v1
+appVersion: 1.11.1
+description: Apache Flink is an open-source stream-processing framework developed
+  by the Apache Software Foundation.
+name: flink
+version: "1"

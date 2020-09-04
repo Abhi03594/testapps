@@ -1,0 +1,47 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OperatorService
+metadata:
+  name: example-operatorservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/flink/values.yaml
+  
+  flink:
+    jobmanager_heap_mb: 1024
+    num_slots_per_taskmanager: 1
+    num_taskmanagers: 1
+    taskmanager_heap_mb: 1024
+  hadoop:
+    core-site.xml: |
+      <?xml version="1.0"?>
+      <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+      <configuration/>
+  hpa:
+    enabled: true
+  image: flink
+  imagePullPolicy: Always
+  imageTag: 1.11.1
+  namespace: flink1
+  persistence:
+    accessMode: ReadWriteOnce
+    enabled: true
+    size: 100Gi
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podSecurityContext:
+    fsGroup: 2000
+    runAsUser: 2000
+  resources:
+    jobmanager:
+      limits:
+        cpu: 1000m
+        memory: 1280Mi
+      requests:
+        cpu: 1000m
+        memory: 1280Mi
+    taskmanager:
+      limits:
+        memory: 1280Mi
+      requests:
+        memory: 1280Mi
+  

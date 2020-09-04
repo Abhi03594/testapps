@@ -1,0 +1,11 @@
+Apache Flink Dashboard:
+
+   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+       
+export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "fullname" . }}-jobmanager --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+   echo http://$SERVICE_IP:8081
+
+
+
+
