@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  kylin:
+  - apiVersion: v2
+    appVersion: 3.1.0
+    created: "2020-09-16T17:20:27.701402487+05:30"
+    description: Apache Kylin is an open source distributed analytics engine designed
+      to provide a SQL interface and multi-dimensional analysis on Hadoop and Alluxio
+      supporting extremely large datasets
+    digest: 273030668d96b38fbb18369365695b00f365a59e8d628a16a44f2f441ec75264
+    name: kylin
+    urls:
+    - kylin-1.tgz
+    version: "1"
+generated: "2020-09-16T17:20:27.700294015+05:30"

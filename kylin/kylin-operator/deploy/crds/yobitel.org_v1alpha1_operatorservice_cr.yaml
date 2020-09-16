@@ -1,0 +1,51 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OperatorService
+metadata:
+  name: example-operatorservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/kylin/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  hpa:
+    enabled: true
+  image: apachekylin/apache-kylin-standalone
+  imagePullSecrets: []
+  imageTag: 4.0.0-alpha
+  imagepullPolicy: IfNotPresent
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - host: chart-example.local
+      paths: []
+    tls: []
+  nameOverride: ""
+  namespace: kylin
+  nodeSelector: {}
+  persistence:
+    accessMode: ReadWriteOnce
+    enabled: true
+    size: 300Gi
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podDisruptionBudgetEnabled: true
+  podSecurityContext:
+    fsGroup: 2000
+    runAsUser: 2000
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  service:
+    port: 7070
+    type: LoadBalancer
+  tolerations: []
+  webui:
+    port: 8088
+    type: LoadBalancer
+  

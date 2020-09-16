@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kylin.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kylin.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 8088
+      name: web
+    - port: 8082
+      name: web2
+    - port: 8042
+      name: api
+    - name: dfs
+      port: 9000
+      protocol: TCP
+    - name: webhdfs
+      port: 50070
+    - name: webhbase
+      port: 16010
+  selector:
+    {{- include "kylin.selectorLabels" . | nindent 4 }}
+
+

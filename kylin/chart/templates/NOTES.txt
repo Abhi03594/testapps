@@ -1,0 +1,19 @@
+You have sucessfully installed Apache Kylin:
+
+1. To fetch Kylin Dashboard:
+ NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+ You can watch the status of by running 'kubectl get --namespace {{ .Values.namespace }} svc -w {{ include "kylin.fullname" . }}'
+
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ include "kylin.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}/kylin/login
+
+2. Hdfs NameNode Web UI- http://$SERVICE_IP:50070
+3. Yarn ResourceManager Web UI- http://$SERVICE_IP:8088
+4. HBase Web UI- http://$SERVICE_IP:16010
+
+Note: Wait for minimum 3 min to obtain the dashboard
+
+Credentials: ADMIN
+To fetch the password:
+$ kubectl get secret kylin-password -n kylin -o jsonpath='{.data.password}' | base64 --decode -
+
