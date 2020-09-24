@@ -1,0 +1,17 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "hbase.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ include "hbase.name" . }}
+    {{- include "hbase.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "hbase.name" . }}
+      component: scheduler
+      release: {{ .Release.Name }}
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}

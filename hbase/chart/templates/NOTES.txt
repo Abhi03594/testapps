@@ -1,0 +1,18 @@
+1. You can get an HBASE Shell by running this command:
+   kubectl exec -n {{ .Values.namespace }} -it {{ include "hbase.fullname" . }}-master-0 -- hbase shell 
+
+2. Inspect hbase master service ports with:
+   kubectl -n {{ .Values.namespace }} describe service {{ include "hbase.fullname" . }}-master
+
+3. Hbase UI:
+
+export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ include "hbase.fullname" . }}-master --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+  echo http://$SERVICE_IP:16010
+
+4. hbase thrift manager UI:
+
+   export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ include "hbase.fullname" . }}-master --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+  echo http://$SERVICE_IP:9095
+
