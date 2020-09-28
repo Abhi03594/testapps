@@ -1,0 +1,13 @@
+Get superset dashboard:
+
+fetch the SERVICE_IP of superset :
+  
+  $ kubectl get all --namespace {{ .Values.namespace }}
+once every pod is up and running check service IP and execute below command. 
+  $ kubectl get svc --namespace {{ .Values.namespace }}
+
+superset dashboard at: http://$SERVICE_IP:8088
+
+Credentials: yobi
+
+ echo PASSWORD=$(kubectl get secret --namespace {{ .Values.namespace }} superset-secret -o jsonpath="{.data.superset-password}" | base64 --decode; echo)

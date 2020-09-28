@@ -1,0 +1,36 @@
+affinity: {}
+fullnameOverride: ""
+hpa:
+  enable: true
+image: yobitel/superset
+imagePullSecrets: []
+imageTag: 0.36.0
+imagepullPolicy: IfNotPresent
+ingress:
+  annotations: {}
+  enabled: false
+  hosts:
+  - host: chart-example.local
+    paths: []
+  tls: []
+mysql:
+  enable: true
+nameOverride: ""
+namespace: superset
+nodeSelector: {}
+pdb:
+  enable: true
+podSecurityContext: {}
+redis:
+  enable: true
+replicaCount: 1
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 500Mi
+securityContext:
+  runAsUser: 1000
+tolerations: []
