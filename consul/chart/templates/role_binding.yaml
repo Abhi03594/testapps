@@ -1,0 +1,12 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: consul-operator
+  namespace: {{ .Values.namespace }}
+subjects:
+- kind: ServiceAccount
+  name: consul-operator
+roleRef:
+  kind: Role
+  name: consul-operator
+  apiGroup: rbac.authorization.k8s.io
