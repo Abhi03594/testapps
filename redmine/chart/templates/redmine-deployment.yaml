@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redmine
+  name: redmine
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redmine
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: redmine
+    spec:
+      containers:
+      - env:
+        - name: DB_ADAPTER
+          value: mysql2
+        - name: DB_HOST
+          value: db
+        - name: DB_NAME
+          value: redmine
+        - name: DB_PASSWORD
+          value: redmine
+        - name: DB_USER
+          value: redmine
+        image: redmine:4.1
+        imagePullPolicy: ""
+        name: redmine
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "500Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi" 
+        readinessProbe:
+          httpGet:
+            path: /account/register
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 15
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /account/register
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 15
+        volumeMounts:
+        - mountPath: /app/redmine
+          name: redmine
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: redmine
+        persistentVolumeClaim:
+          claimName: redmine
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: redmine
+description: Redmine is a flexible project management web application.
+version: 1.0
+appVersion: 4.1.1
+
+

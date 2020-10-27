@@ -1,0 +1,13 @@
+Get Redmine dashboard:
+
+fetch the SERVICE_IP of Redmine :
+  
+ export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} redmine --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+ Redmine dashboard at: echo http://$SERVICE_IP:80
+
+Get full access of Dashboard sign in with
+
+Login Credentials : admin/admin
+
+Change password immediately once you login to portal.

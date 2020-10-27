@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redmine-operator
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: redmine-operator
+  template:
+    metadata:
+      labels:
+        name: redmine-operator
+    spec:
+      serviceAccountName: redmine-operator
+      containers:
+        - name: redmine-operator
+          # Replace this with the built image name
+          image: yobitel/redmine-ope:4.1.1
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "redmine-operator"
