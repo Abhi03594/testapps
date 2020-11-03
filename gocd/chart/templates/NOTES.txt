@@ -1,0 +1,5 @@
+to access gocd dashboard:
+$ export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} {{ template "gocd.fullname" . }}-server --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+$ echo http://$SERVICE_IP:8153
+
+
