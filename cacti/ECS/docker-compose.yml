@@ -1,0 +1,12 @@
+cacti:
+  image: yobite/cacti:1.0
+  ports:
+   - "80:80"
+   - "161:161"
+  volumes:
+   - /etc/localtime:/etc/localtime:ro
+   - ./plugins/:/opt/cacti/plugins/
+   - ./log/:/var/log/
+   - ./templates/:/opt/cacti/templates/
+   - ./mysql/:/var/lib/mysql/
+   - ./rrd/:/opt/cacti/rrd/

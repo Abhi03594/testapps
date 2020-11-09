@@ -1,0 +1,64 @@
+apiVersion: yobitel.org/v1alpha1
+kind: CactiService
+metadata:
+  name: example-cactiservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/cacti/values.yaml
+  
+namespace: cacti
+
+replicaCount: 1
+
+image: yobitel/cacti
+imageTag: "1.0"
+imagepullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: cacti-opeartor
+
+serviceAccount:
+  create: true
+  name: cactui-operator
+
+podSecurityContext: 
+  fsGroup: 2000
+  runAsUser: 2000
+
+service:
+  type: LoadBalancer
+  port: 80
+
+hpa:
+  enabled: true
+
+podDisruptionBudgetEnabled: true
+podDisruptionBudget:
+  maxUnavailable: 1
+
+persistence:
+  enabled: true
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 300Gi
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
