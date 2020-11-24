@@ -1,0 +1,46 @@
+namespace: orangehrm
+
+image: yobitel/orangehrm
+imageTag: "4.6"
+imagepullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+hpa:
+  enabled: true
+
+pdb:
+  enabled: true
+
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: orange-opeartor
+
+serviceAccount:
+  create: true
+  name: orange-operator
+
+mariad:
+  enabled: true
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+persistence:
+  enabled: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

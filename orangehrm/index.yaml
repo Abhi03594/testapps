@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  orangehrm:
+  - apiVersion: v1
+    appVersion: "4.6"
+    created: "2020-11-24T15:18:24.457293541+05:30"
+    description: OrangeHRM is a robust, full-featured HR system
+    digest: 54ee90bcfb2fbe99be51a415e4b63ef1a0c80e8f7e39e926b757b4077821d930
+    name: orangehrm
+    urls:
+    - orangehrm-1.0.tgz
+    version: "1.0"
+generated: "2020-11-24T15:18:24.456636498+05:30"

@@ -1,0 +1,17 @@
+1. Get the application URL by running these commands:
+
+fetch the SERVICE_IP of Obersvium :
+  
+  $ kubectl get all --namespace {{ .Values.namespace }}
+once every pod is up and running check service IP and execute below command. 
+  $ kubectl get svc --namespace {{ .Values.namespace }}
+
+Orangehrm dashboard at: http://$SERVICE_IP:80
+
+Default Crediantials 
+
+Database Host Name : mariadb
+Database Host port : 3306
+Database Name : orangrehrm
+Database Username : root
+Database Userpassword : orangehrm
