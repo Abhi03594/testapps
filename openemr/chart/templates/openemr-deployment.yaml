@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: openemr
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: openemr
+spec:
+  selector:
+    matchLabels:
+      app: openemr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: openemr
+      labels:
+        app: openemr
+    spec:
+      containers:
+      - image: openemr/openemr:6.0.0
+        name: openemr
+        env:
+          - name: MYSQL_HOST
+            value: mysql
+          - name: MYSQL_ROOT_PASS
+            value: root
+          - name: MYSQL_USER
+            value: openemr
+          - name: MYSQL_PASS
+            value: openemr
+          - name: OE_USER
+            value: admin
+          - name: OE_PASS
+            valueFrom:
+              secretKeyRef:
+                name: openemr-secret
+                key: openemr-password
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "500Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        volumeMounts:
+          - name: openemr-log-persistent-storage
+            mountPath: /home/yobitel/Desktop/openemr/apache2
+          - name: openemr-site-persistent-storage
+            mountPath: /home/yobitel/Desktop/openemr/sites
+      volumes:
+        - name: openemr-log-persistent-storage
+          persistentVolumeClaim:
+             claimName: openemr-log-persistent-volume-claim          
+        - name: openemr-site-persistent-storage
+          persistentVolumeClaim:
+             claimName: openemr-site-persistent-volume-claim    
+       

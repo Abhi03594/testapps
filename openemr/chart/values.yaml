@@ -1,0 +1,49 @@
+namespace: openemr
+
+image: openemr/openemr
+imageTag: "6.0.0"
+imagepullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+hpa:
+  enabled: true
+
+pdb:
+  enabled: true
+
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: openemr-opeartor
+
+serviceAccount:
+  create: true
+  name: openemr-operator
+
+mysql:
+  enabled: true
+
+persistence:
+  enabled: true
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

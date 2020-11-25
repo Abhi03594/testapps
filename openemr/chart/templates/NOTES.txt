@@ -1,0 +1,13 @@
+To fetch OpenEMR Dashboard:
+
+$ export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.namespace }} openemr-https --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+
+ echo https://$SERVICE_IP:443
+
+Credientials:
+
+Login Name:- admin
+
+Obtain Password:
+
+echo PASSWORD=$(kubectl get secret --namespace {{ .Values.namespace }} openemr-secret -o jsonpath="{.data.openemr-password}" | base64 --decode; echo)

@@ -1,0 +1,56 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OpenemrService
+metadata:
+  name: yobitel-openemrservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/openemr/values.yaml
+
+namespace: openemr
+
+image: openemr/openemr
+imageTag: "6.0.0"
+imagepullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+hpa:
+  enabled: true
+
+pdb:
+  enabled: true
+
+crd:
+  install: true
+
+rbac:
+  create: true
+  name: openemr-opeartor
+
+serviceAccount:
+  create: true
+  name: openemr-operator
+
+persistence:
+  enabled: true
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+
+mysql:
+  enabled: true
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+  

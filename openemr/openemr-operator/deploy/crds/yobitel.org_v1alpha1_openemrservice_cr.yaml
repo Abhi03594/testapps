@@ -1,0 +1,33 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OpenemrService
+metadata:
+  name: example-openemrservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/openemr/values.yaml
+  
+  affinity: {}
+  fullnameOverride: ""
+  hpa:
+    enabled: true
+  image: openemr/openemr
+  imagePullSecrets: []
+  imageTag: 6.0.0
+  imagepullPolicy: IfNotPresent
+  mysql:
+    enabled: true
+  nameOverride: ""
+  namespace: openemr
+  nodeSelector: {}
+  pdb:
+    enabled: true
+  persistence:
+    enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+  tolerations: []
+  

@@ -1,22 +1,10 @@
-FROM rocker/r-ver:4.0.0
+FROM ubuntu:19.10
 
-LABEL org.label-schema.license="GPL-2.0" \
-      org.label-schema.vcs-url="https://github.com/rocker-org/rocker-versioned" \
-      org.label-schema.vendor="Rocker Project" \
-      maintainer="Carl Boettiger <cboettig@ropensci.org>"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext
 
-ENV S6_VERSION=v1.21.7.0
-ENV RSTUDIO_VERSION=latest
-ENV PATH=/usr/lib/rstudio-server/bin:$PATH
+ADD chart /tmp/chart
+RUN cd /tmp && tar -czvf /tmp/openemr.tar.gz chart
 
-
-RUN /rocker_scripts/install_rstudio.sh
-RUN /rocker_scripts/install_pandoc.sh
-
-EXPOSE 8787
-
-CMD ["/init"]
-
-
-
-
+ENV WAIT_FOR_READY_TIMEOUT 1800
+ENV TESTER_TIMEOUT 1800

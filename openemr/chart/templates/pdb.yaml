@@ -1,0 +1,12 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: openemr
+  namespace: {{ .Values.namespace }}
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: openemr
+
+
