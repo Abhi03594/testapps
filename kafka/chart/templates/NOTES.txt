@@ -1,0 +1,52 @@
+### Connecting to Kafka from inside Kubernetes
+
+You can connect to Kafka by running a simple pod in the K8s cluster like this with a configuration like this:
+
+Run:
+
+cat <<EOF | kubectl apply -f - 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: testclient
+  namespace: kafka
+spec:
+  containers:
+  - name: kafka
+    image: 354808810060.dkr.ecr.eu-central-1.amazonaws.com/client:2.6
+    command:
+      - sh
+      - -c
+      - "exec tail -f /dev/null"
+EOF
+
+Then, using the testclient, we create the first topic, which we are going to use to post messages:
+
+kubectl --namespace {{.Values.namespace}} exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper {{ .Release.Name }}-zookeeper:2181 --topic message --create --partitions 1 --replication-factor 1
+
+
+Next, verify that the topic exists:
+
+kubectl --namespace kafka exec -ti testclient -- ./bin/kafka-topics.sh --zookeeper {{ .Release.Name }}-zookeeper:2181 --list
+
+
+Now we can create one consumer and one producer instance so that we can send and consume messages.
+
+First create one or two listeners,
+
+kubectl --namespace kafka exec -ti testclient -- ./bin/kafka-console-consumer.sh --bootstrap-server {{ include "kafka.fullname" . }}:9092 --topic message --from-beginning
+
+Then create the producer session and type some messages. You will be able to see them propagate to the consumer sessions:
+
+
+kubectl --namespace kafka exec -ti testclient -- ./bin/kafka-console-producer.sh --broker-list {{ include "kafka.fullname" . }}:9092 --topic message
+> hi
+
+<switching on each consumer you will see>
+> hi
+ 
+Press Ctrl+c to stop producer or consumer.
+
+
+
+

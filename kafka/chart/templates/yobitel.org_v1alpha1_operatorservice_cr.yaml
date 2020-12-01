@@ -1,0 +1,155 @@
+apiVersion: yobitel.org/v1alpha1
+kind: OperatorService
+metadata:
+  name: example-operatorservice
+spec:
+  # Default values copied from <project_dir>/helm-charts/kafka/values.yaml
+  
+  additionalPorts: {}
+  affinity: {}
+  configJob:
+    backoffLimit: 6
+  configurationOverrides:
+    confluent.support.metrics.enable: false
+  envOverrides: {}
+  external:
+    distinct: false
+    dns:
+      useExternal: true
+      useInternal: false
+    domain: cluster.local
+    enabled: false
+    firstListenerPort: 31090
+    init:
+      image: lwolf/kubectl_deployer
+      imagePullPolicy: IfNotPresent
+      imageTag: "0.4"
+    loadBalancerIP: []
+    loadBalancerSourceRanges: []
+    servicePort: 19092
+    type: NodePort
+  headless:
+    port: 9092
+  hpa:
+    enabled: true
+  image: yobitel/kafka
+  imagePullPolicy: IfNotPresent
+  imageTag: 2.6.0
+  jmx:
+    configMap:
+      enabled: true
+      overrideConfig: {}
+      overrideName: ""
+    port: 5555
+    whitelistObjectNames:
+    - kafka.controller:*
+    - kafka.server:*
+    - java.lang:*
+    - kafka.network:*
+    - kafka.log:*
+  kafkaHeapOptions: -Xmx1G -Xms1G
+  logSubPath: logs
+  namespace: kafka
+  nodeSelector: {}
+  persistence:
+    enabled: true
+    mountPath: /opt/kafka/data
+    size: 1Gi
+  podAnnotations: {}
+  podDisruptionBudget:
+    maxUnavailable: 1
+  podLabels: {}
+  podManagementPolicy: OrderedReady
+  productCode: k188zgtzb1geiu22p6twlkeq
+  prometheus:
+    jmx:
+      enabled: false
+      image: solsson/kafka-prometheus-jmx-exporter@sha256
+      imageTag: a23062396cd5af1acdf76512632c20ea6be76885dfc20cd9ff40fb23846557e8
+      interval: 10s
+      port: 5556
+      resources: {}
+      scrapeTimeout: 10s
+    kafka:
+      affinity: {}
+      enabled: false
+      image: danielqsj/kafka-exporter
+      imageTag: v1.2.0
+      interval: 10s
+      nodeSelector: {}
+      port: 9308
+      resources: {}
+      scrapeTimeout: 10s
+      tolerations: []
+    operator:
+      enabled: false
+      prometheusRule:
+        enabled: false
+        namespace: monitoring
+        releaseNamespace: false
+        rules:
+        - alert: KafkaNoActiveControllers
+          annotations:
+            message: The number of active controllers in {{ "{{" }} $labels.namespace
+              {{ "}}" }} is less than 1. This usually means that some of the Kafka nodes
+              aren't communicating properly. If it doesn't resolve itself you can try
+              killing the pods (one by one whilst monitoring the under-replicated partitions
+              graph).
+          expr: max(kafka_controller_kafkacontroller_activecontrollercount_value) by
+            (namespace) < 1
+          for: 5m
+          labels:
+            severity: critical
+        - alert: KafkaMultipleActiveControllers
+          annotations:
+            message: The number of active controllers in {{ "{{" }} $labels.namespace
+              {{ "}}" }} is greater than 1. This usually means that some of the Kafka
+              nodes aren't communicating properly. If it doesn't resolve itself you
+              can try killing the pods (one by one whilst monitoring the under-replicated
+              partitions graph).
+          expr: max(kafka_controller_kafkacontroller_activecontrollercount_value) by
+            (namespace) > 1
+          for: 5m
+          labels:
+            severity: critical
+        selector:
+          prometheus: kube-prometheus
+      serviceMonitor:
+        namespace: monitoring
+        releaseNamespace: false
+        selector:
+          prometheus: kube-prometheus
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  replicas: 3
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1536Mi
+    requests:
+      cpu: 100m
+      memory: 1024Mi
+  securityContext: {}
+  terminationGracePeriodSeconds: 60
+  testsEnabled: true
+  tolerations: []
+  topics: []
+  updateStrategy:
+    type: RollingUpdate
+  zookeeper:
+    affinity: {}
+    enabled: true
+    env:
+      ZK_HEAP_SIZE: 1G
+    image:
+      PullPolicy: IfNotPresent
+    persistence:
+      enabled: false
+    port: 2181
+    resources: null
+    url: ""
+  
