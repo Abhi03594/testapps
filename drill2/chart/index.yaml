@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  drill:
+  - apiVersion: v2
+    appVersion: 1.17.0
+    created: "2020-12-07T12:19:48.229170072+05:30"
+    description: Helm Charts for deploying Apache Drill Clusters on Kubernetes
+    digest: 494d51a280b9496fe9f3ba8622d70fab836b9b7e16ab65cdcd5b2f8cbfef88d1
+    home: http://drill.apache.org/
+    name: drill
+    type: application
+    urls:
+    - drill-1.tgz
+    version: "1"
+generated: "2020-12-07T12:19:48.228232378+05:30"

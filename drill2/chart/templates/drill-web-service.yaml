@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{.Values.global.namespace}}
+  name: {{.Values.drill.id}}-web-svc
+  labels:
+    app: {{.Values.drill.id}}-web-svc
+spec:
+  ports:
+  - protocol: TCP
+    name: http
+    port: {{ .Values.drill.httpPort }}
+    targetPort: {{ .Values.drill.httpPort }}
+  - protocol: TCP
+    name: server
+    port: {{ .Values.drill.userServerPort }}
+    targetPort: {{ .Values.drill.userServerPort }}
+  type: LoadBalancer
+  selector:
+    app: drill-app

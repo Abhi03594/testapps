@@ -1,0 +1,7 @@
+ Get the application URL by running these commands:
+
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Values.global.namespace }} {{.Values.drill.id}}-web-svc --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:8047
+

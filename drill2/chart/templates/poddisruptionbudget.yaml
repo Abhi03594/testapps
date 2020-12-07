@@ -1,0 +1,12 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  namespace: {{.Values.global.namespace}}
+  name: {{.Values.drill.id}}-pdb
+spec:
+  selector: 
+    matchLabels: 
+      app: drill-app
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}
