@@ -1,0 +1,16 @@
+{{- if .Values.podDisruptionBudgetEnabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "cacti.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "cacti.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "cacti.fullname" . }}
+      component: scheduler
+      release: {{ .Release.Name }}
+{{ toYaml .Values.podDisruptionBudget | indent 2 }}
+{{- end }}

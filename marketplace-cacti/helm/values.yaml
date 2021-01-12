@@ -1,0 +1,54 @@
+# Default values for cacti.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+namespace: cacti
+
+replicaCount: 1
+
+productCode: "1e5f779qqc1bccc7jy0r18x0l"
+
+
+image: 354808810060.dkr.ecr.us-east-1.amazonaws.com/yobitel:1.0
+imagepullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+
+podSecurityContext: 
+  fsGroup: 2000
+  runAsUser: 2000
+
+service:
+  type: LoadBalancer
+  port: 80
+
+hpa:
+  enabled: true
+
+serviceAccountName: cacti
+
+podDisruptionBudgetEnabled: true
+podDisruptionBudget:
+  maxUnavailable: 1
+
+persistence:
+  enabled: true
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 300Gi
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "500Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

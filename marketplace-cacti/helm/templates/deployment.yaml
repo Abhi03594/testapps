@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cacti.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "cacti.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cacti.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cacti.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image}}"
+        imagePullPolicy: {{default "IfNotPresent" .Values.ImagePullPolicy}}      
+        ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+        env:
+          - name: PRODUCT_CODE
+            value: {{ .Values.productCode }}
+ 
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+        - name: plugins
+          mountPath: /opt/cacti/plugins
+        - name: log
+          mountPath: /var/log
+        - name: templates
+          mountPath: /opt/cacti/templates
+        - name: mysql
+          mountPath: /var/lib/mysql
+        - name: rra
+          mountPath: /opt/cacti/rra
+      volumes:
+        - name: plugins
+        - name: log
+        - name: templates
+        - name: mysql
+        - name: rra
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "cacti.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end -}}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+
